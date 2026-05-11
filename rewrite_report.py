@@ -1891,55 +1891,68 @@ for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
         p.runs[0].text = txt
 
 # ===========================================================
-# AI TEXT CLEANER (replicates aitextclean.com)
-# Strips invisible Unicode fingerprints that AI detectors flag
+# AI TEXT CLEANER — ported from index.html sanitizeText()
 # ===========================================================
 
 import re as _re
+import unicodedata as _ud
 
 def ai_text_clean(text):
-    # 1. Remove zero-width characters (invisible AI fingerprints)
-    text = text.replace("\u200b", "")   # zero-width space
-    text = text.replace("\u200c", "")   # zero-width non-joiner
-    text = text.replace("\u200d", "")   # zero-width joiner
-    text = text.replace("\ufeff", "")   # byte order mark
-    text = text.replace("\u200e", "")   # left-to-right mark
-    text = text.replace("\u200f", "")   # right-to-left mark
-    text = text.replace("\u2060", "")   # word joiner
-    text = text.replace("\u00ad", "")   # soft hyphen
+    # 0) NFKC normalization (decomposes ligatures, normalizes width variants)
+    text = _ud.normalize("NFKC", text)
 
-    # 2. Convert non-breaking spaces to regular spaces
-    text = text.replace("\u00a0", " ")
+    # 1) Line breaks: CR/LF -> LF
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # 3. Normalize smart/curly quotes to straight quotes
-    text = text.replace("\u201c", '"')  # left double curly
-    text = text.replace("\u201d", '"')  # right double curly
-    text = text.replace("\u2018", "'")  # left single curly
-    text = text.replace("\u2019", "'")  # right single curly
-    text = text.replace("\u201a", "'")  # single low-9
-    text = text.replace("\u201e", '"')  # double low-9
+    # 2) Zero-width / BOM / format characters
+    text = _re.sub(r"[\u200B\u200C\u200D\u2060\uFEFF\u180E]", "", text)
 
-    # 4. Normalize dashes
-    text = text.replace("\u2014", "--") # em-dash to double hyphen
-    text = text.replace("\u2013", "-")  # en-dash to hyphen
+    # 3) Non-breaking, thin, figure, narrow no-break spaces -> normal space
+    text = _re.sub(r"[\u00A0\u2007\u202F\u2009\u200A]", " ", text)
 
-    # 5. Convert ellipsis character to three dots
+    # 4) Control characters (except newline and tab)
+    text = _re.sub(r"[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]", "", text)
+
+    # 5) Typography
+    # em-dash, en-dash, minus sign -> single hyphen
+    text = _re.sub(r"[\u2013\u2014\u2212]", "-", text)
+
+    # smart double quotes -> straight
+    text = _re.sub(r'[\u201C\u201D\u201E\u00AB\u00BB]', '"', text)
+
+    # smart single quotes -> straight apostrophe
+    text = _re.sub(r"[\u2018\u2019\u201A\u201B\u2039\u203A]", "'", text)
+
+    # ellipsis character -> three dots
     text = text.replace("\u2026", "...")
 
-    # 6. Remove trailing whitespace per line
-    text = "\n".join(line.rstrip() for line in text.split("\n"))
+    # bullets -> hyphen
+    text = _re.sub(r"[\u2022\u25E6\u00B7\u2219]", "-", text)
 
-    # 7. Collapse multiple spaces into single space
-    text = _re.sub(r"  +", " ", text)
+    # 6) Remove emojis
+    text = _re.sub(
+        r"[\u00A9\u00AE\u2000-\u3300]|"
+        r"[\U0001F000-\U0001F9FF]",
+        "", text
+    )
+
+    # 7) Spaces before punctuation
+    text = _re.sub(r"\s+([.,!?;:])", r"\1", text)
+
+    # 8) Whitespace normalization
+    text = _re.sub(r"[ \t]*\n[ \t]*", "\n", text)
+    text = _re.sub(r"[ \t]{2,}", " ", text)
+    text = _re.sub(r"\n{3,}", "\n\n", text)
+    text = "\n".join(line.rstrip() for line in text.split("\n"))
+    text = text.strip()
 
     return text
 
 
 cleaned_count = 0
 
-# Clean ALL paragraphs in rewrite zones
-for idx in rewrite_zone_indices:
-    para = doc.paragraphs[idx]
+# Clean ALL paragraphs in the entire document (chapters + everything)
+for para in doc.paragraphs:
     for run in para.runs:
         if run.text:
             original = run.text
@@ -1947,16 +1960,17 @@ for idx in rewrite_zone_indices:
             if run.text != original:
                 cleaned_count += 1
 
-# Clean table cells that were rewritten
-for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
-    cell = doc.tables[t_idx].cell(r_idx, c_idx)
-    for p in cell.paragraphs:
-        for run in p.runs:
-            if run.text:
-                original = run.text
-                run.text = ai_text_clean(run.text)
-                if run.text != original:
-                    cleaned_count += 1
+# Clean ALL table cells in the entire document
+for table in doc.tables:
+    for row in table.rows:
+        for cell in row.cells:
+            for p in cell.paragraphs:
+                for run in p.runs:
+                    if run.text:
+                        original = run.text
+                        run.text = ai_text_clean(run.text)
+                        if run.text != original:
+                            cleaned_count += 1
 
 print(f"AI text cleaning applied to {cleaned_count} text runs")
 
