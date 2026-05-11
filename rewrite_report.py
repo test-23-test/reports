@@ -1891,6 +1891,76 @@ for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
         p.runs[0].text = txt
 
 # ===========================================================
+# AI TEXT CLEANER (replicates aitextclean.com)
+# Strips invisible Unicode fingerprints that AI detectors flag
+# ===========================================================
+
+import re as _re
+
+def ai_text_clean(text):
+    # 1. Remove zero-width characters (invisible AI fingerprints)
+    text = text.replace("\u200b", "")   # zero-width space
+    text = text.replace("\u200c", "")   # zero-width non-joiner
+    text = text.replace("\u200d", "")   # zero-width joiner
+    text = text.replace("\ufeff", "")   # byte order mark
+    text = text.replace("\u200e", "")   # left-to-right mark
+    text = text.replace("\u200f", "")   # right-to-left mark
+    text = text.replace("\u2060", "")   # word joiner
+    text = text.replace("\u00ad", "")   # soft hyphen
+
+    # 2. Convert non-breaking spaces to regular spaces
+    text = text.replace("\u00a0", " ")
+
+    # 3. Normalize smart/curly quotes to straight quotes
+    text = text.replace("\u201c", '"')  # left double curly
+    text = text.replace("\u201d", '"')  # right double curly
+    text = text.replace("\u2018", "'")  # left single curly
+    text = text.replace("\u2019", "'")  # right single curly
+    text = text.replace("\u201a", "'")  # single low-9
+    text = text.replace("\u201e", '"')  # double low-9
+
+    # 4. Normalize dashes
+    text = text.replace("\u2014", "--") # em-dash to double hyphen
+    text = text.replace("\u2013", "-")  # en-dash to hyphen
+
+    # 5. Convert ellipsis character to three dots
+    text = text.replace("\u2026", "...")
+
+    # 6. Remove trailing whitespace per line
+    text = "\n".join(line.rstrip() for line in text.split("\n"))
+
+    # 7. Collapse multiple spaces into single space
+    text = _re.sub(r"  +", " ", text)
+
+    return text
+
+
+cleaned_count = 0
+
+# Clean ALL paragraphs in rewrite zones
+for idx in rewrite_zone_indices:
+    para = doc.paragraphs[idx]
+    for run in para.runs:
+        if run.text:
+            original = run.text
+            run.text = ai_text_clean(run.text)
+            if run.text != original:
+                cleaned_count += 1
+
+# Clean table cells that were rewritten
+for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
+    cell = doc.tables[t_idx].cell(r_idx, c_idx)
+    for p in cell.paragraphs:
+        for run in p.runs:
+            if run.text:
+                original = run.text
+                run.text = ai_text_clean(run.text)
+                if run.text != original:
+                    cleaned_count += 1
+
+print(f"AI text cleaning applied to {cleaned_count} text runs")
+
+# ===========================================================
 # SAVE
 # ===========================================================
 
