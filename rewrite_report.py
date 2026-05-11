@@ -1836,142 +1836,362 @@ for (t_idx, r_idx, c_idx), new_text in TABLE_CELL_REWRITES.items():
     replace_cell_text(t_idx, r_idx, c_idx, new_text)
 
 # ===========================================================
-# POST-PROCESSING: Inject human writing patterns
+# COMPREHENSIVE HUMANIZER + AI TEXT CLEANER
+# Ported from enhanced index.html — reduces AI detection
+# by replacing AI-common vocabulary, transition words,
+# filler phrases, and applying contractions + Unicode cleanup
 # ===========================================================
 
 import random
-random.seed(42)
-
-contraction_map = [
-    ("does not", "doesn\u2019t"),
-    ("do not", "don\u2019t"),
-    ("did not", "didn\u2019t"),
-    ("is not", "isn\u2019t"),
-    ("are not", "aren\u2019t"),
-    ("was not", "wasn\u2019t"),
-    ("were not", "weren\u2019t"),
-    ("cannot", "can\u2019t"),
-    ("could not", "couldn\u2019t"),
-    ("would not", "wouldn\u2019t"),
-    ("will not", "won\u2019t"),
-    ("should not", "shouldn\u2019t"),
-    ("it is ", "it\u2019s "),
-    ("that is ", "that\u2019s "),
-    ("there is ", "there\u2019s "),
-    ("what is ", "what\u2019s "),
-    ("It is ", "It\u2019s "),
-    ("That is ", "That\u2019s "),
-    ("There is ", "There\u2019s "),
-    ("What is ", "What\u2019s "),
-]
-
-rewrite_zone_indices = set(ALL_REWRITES.keys())
-
-for idx in rewrite_zone_indices:
-    para = doc.paragraphs[idx]
-    if not para.runs or not para.runs[0].text.strip():
-        continue
-    txt = para.runs[0].text
-
-    for formal, contracted in contraction_map:
-        if formal in txt and random.random() < 0.65:
-            txt = txt.replace(formal, contracted, 1)
-
-    para.runs[0].text = txt
-
-for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
-    cell = doc.tables[t_idx].cell(r_idx, c_idx)
-    for p in cell.paragraphs:
-        if not p.runs or not p.runs[0].text.strip():
-            continue
-        txt = p.runs[0].text
-        for formal, contracted in contraction_map:
-            if formal in txt and random.random() < 0.65:
-                txt = txt.replace(formal, contracted, 1)
-        p.runs[0].text = txt
-
-# ===========================================================
-# AI TEXT CLEANER — ported from index.html sanitizeText()
-# ===========================================================
-
 import re as _re
 import unicodedata as _ud
 
-def ai_text_clean(text):
-    # 0) NFKC normalization (decomposes ligatures, normalizes width variants)
-    text = _ud.normalize("NFKC", text)
+random.seed(42)
 
-    # 1) Line breaks: CR/LF -> LF
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
+def _pick(lst):
+    return lst[random.randint(0, len(lst) - 1)]
 
-    # 2) Zero-width / BOM / format characters
-    text = _re.sub(r"[\u200B\u200C\u200D\u2060\uFEFF\u180E]", "", text)
 
-    # 3) Non-breaking, thin, figure, narrow no-break spaces -> normal space
-    text = _re.sub(r"[\u00A0\u2007\u202F\u2009\u200A]", " ", text)
+def humanize_text(text):
+    if not text or not text.strip():
+        return text
 
-    # 4) Control characters (except newline and tab)
-    text = _re.sub(r"[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]", "", text)
+    # ── 1) TRANSITION WORDS (AI favorites -> human alternatives) ──
+    tr_rules = [
+        (r"\bFurthermore,?\s", lambda: _pick(["Also, ", "Plus, ", "And ", "Besides, "])),
+        (r"\bMoreover,?\s", lambda: _pick(["Also, ", "What's more, ", "And ", "Plus, "])),
+        (r"\bAdditionally,?\s", lambda: _pick(["Also, ", "Plus, ", "And ", "Besides, "])),
+        (r"\bConsequently,?\s", lambda: _pick(["So, ", "As a result, ", "That's why "])),
+        (r"\bNevertheless,?\s", lambda: _pick(["Still, ", "Even so, ", "That said, ", "But "])),
+        (r"\bNonetheless,?\s", lambda: _pick(["Still, ", "Even so, ", "Yet, "])),
+        (r"\bSubsequently,?\s", lambda: _pick(["Then, ", "After that, ", "Later, "])),
+        (r"\bConversely,?\s", lambda: _pick(["On the flip side, ", "Then again, ", "But "])),
+        (r"\bUltimately,?\s", lambda: _pick(["In the end, ", "When all is said and done, "])),
+        (r"(?i)\bIn\s+addition,?\s", lambda: _pick(["Also, ", "Plus, ", "And "])),
+        (r"(?i)\bAs\s+a\s+result,?\s", lambda: _pick(["So, ", "Because of this, "])),
+        (r"(?i)\bIn\s+particular,?\s", lambda: _pick(["Especially, ", "Mainly, "])),
+        (r"\bSpecifically,?\s", lambda: _pick(["In particular, ", "Namely, ", "That is, "])),
+        (r"\bAccordingly,?\s", lambda: _pick(["So, ", "For that reason, "])),
+        (r"\bHence,?\s", lambda: _pick(["So, ", "That's why "])),
+        (r"\bThus,?\s", lambda: _pick(["So, ", "This way, "])),
+    ]
+    for pattern, replacer in tr_rules:
+        text = _re.sub(pattern, lambda m: replacer(), text)
 
-    # 5) Typography
-    # em-dash, en-dash, minus sign -> single hyphen
-    text = _re.sub(r"[\u2013\u2014\u2212]", "-", text)
+    # ── 2) FORMAL VOCABULARY -> SIMPLER WORDS ──
+    voc_rules = [
+        (r"(?i)\butilizes\b", "uses"), (r"(?i)\butilize\b", "use"),
+        (r"(?i)\butilized\b", "used"), (r"(?i)\butilizing\b", "using"),
+        (r"(?i)\bfacilitates\b", "helps"), (r"(?i)\bfacilitate\b", "help"),
+        (r"(?i)\bfacilitated\b", "helped"), (r"(?i)\bfacilitating\b", "helping"),
+        (r"(?i)\bdemonstrates\b", "shows"), (r"(?i)\bdemonstrate\b", "show"),
+        (r"(?i)\bdemonstrated\b", "showed"), (r"(?i)\bdemonstrating\b", "showing"),
+        (r"(?i)\bcomprehensive\b", lambda: _pick(["thorough", "complete", "full"])),
+        (r"(?i)\bsignificantly\b", lambda: _pick(["greatly", "noticeably", "a lot"])),
+        (r"(?i)\bsignificant\b", lambda: _pick(["big", "major", "notable"])),
+        (r"(?i)\bsubstantially\b", lambda: _pick(["greatly", "largely", "considerably"])),
+        (r"(?i)\bsubstantial\b", lambda: _pick(["big", "large", "considerable"])),
+        (r"(?i)\bapproximately\b", lambda: _pick(["about", "around", "roughly"])),
+        (r"(?i)\bnumerous\b", lambda: _pick(["many", "several", "quite a few"])),
+        (r"(?i)\boptimal\b", lambda: _pick(["best", "ideal"])),
+        (r"(?i)\benhances\b", "improves"), (r"(?i)\benhance\b", "improve"),
+        (r"(?i)\benhanced\b", "improved"), (r"(?i)\benhancing\b", "improving"),
+        (r"(?i)\bleverages\b", "uses"), (r"(?i)\bleverage\b", "use"),
+        (r"(?i)\bleveraging\b", "using"), (r"(?i)\bleveraged\b", "used"),
+        (r"(?i)\bensures\b", "makes sure"), (r"(?i)\bensure\b", "make sure"),
+        (r"(?i)\bensuring\b", "making sure"),
+        (r"(?i)\bpivotal\b", lambda: _pick(["key", "central", "important"])),
+        (r"(?i)\bmultifaceted\b", lambda: _pick(["complex", "varied"])),
+        (r"(?i)\bstreamlines\b", "simplifies"), (r"(?i)\bstreamline\b", "simplify"),
+        (r"(?i)\bstreamlining\b", "simplifying"),
+        (r"(?i)\bparamount\b", lambda: _pick(["top priority", "most important"])),
+        (r"(?i)\brobust\b", lambda: _pick(["strong", "solid", "reliable"])),
+        (r"(?i)\bseamlessly\b", "smoothly"), (r"(?i)\bseamless\b", "smooth"),
+        (r"(?i)\binnovative\b", lambda: _pick(["new", "creative", "fresh"])),
+        (r"(?i)\bholistic\b", lambda: _pick(["overall", "whole", "complete"])),
+        (r"(?i)\bparadigms\b", "models"), (r"(?i)\bparadigm\b", "model"),
+        (r"(?i)\bmethodologies\b", "methods"),
+        (r"(?i)\bunderscores\b", "highlights"), (r"(?i)\bunderscore\b", "highlight"),
+        (r"(?i)\bunderscoring\b", "highlighting"),
+        (r"(?i)\bendeavors\b", "efforts"), (r"(?i)\bendeavor\b", "effort"),
+        (r"(?i)\baugments\b", "boosts"), (r"(?i)\baugment\b", "boost"),
+        (r"(?i)\baugmenting\b", "boosting"),
+        (r"(?i)\bmitigates\b", "reduces"), (r"(?i)\bmitigate\b", "reduce"),
+        (r"(?i)\bmitigating\b", "reducing"), (r"(?i)\bmitigation\b", "reduction"),
+        (r"(?i)\bascertains\b", "finds out"), (r"(?i)\bascertain\b", "find out"),
+        (r"(?i)\bascertained\b", "found out"),
+        (r"(?i)\bcommences\b", "starts"), (r"(?i)\bcommence\b", "start"),
+        (r"(?i)\bcommenced\b", "started"), (r"(?i)\bcommencing\b", "starting"),
+        (r"(?i)\bterminates\b", "ends"), (r"(?i)\bterminate\b", "end"),
+        (r"(?i)\bterminated\b", "ended"),
+        (r"(?i)\bexpedites\b", "speeds up"), (r"(?i)\bexpedite\b", "speed up"),
+        (r"(?i)\bexpediting\b", "speeding up"),
+        (r"(?i)\brequisite\b", "needed"),
+        (r"(?i)\bpredominantly\b", lambda: _pick(["mostly", "mainly"])),
+        (r"(?i)\bpredominant\b", lambda: _pick(["main", "primary"])),
+        (r"(?i)\bcorroborates\b", "backs up"), (r"(?i)\bcorroborate\b", "back up"),
+        (r"(?i)\bcorroborating\b", "backing up"),
+        (r"(?i)\belucidated\b", "explained"), (r"(?i)\belucidate\b", "explain"),
+        (r"(?i)\belucidating\b", "explaining"),
+        (r"(?i)\bameliorate\b", "improve"), (r"(?i)\bameliorates\b", "improves"),
+        (r"(?i)\bamelioration\b", "improvement"),
+        (r"(?i)\bdelineates\b", "outlines"), (r"(?i)\bdelineate\b", "outline"),
+        (r"(?i)\bdelineating\b", "outlining"),
+        (r"(?i)\bpropensity\b", "tendency"),
+        (r"(?i)\bdiscernible\b", "noticeable"),
+        (r"(?i)\bpertaining to\b", "about"),
+        (r"(?i)\bwith respect to\b", "about"),
+        (r"(?i)\bwith regard to\b", "about"),
+        (r"(?i)\bin the context of\b", "in"),
+        (r"(?i)\bconducive\b", "helpful"),
+        (r"(?i)\bexemplifies\b", "shows"), (r"(?i)\bexemplify\b", "show"),
+        (r"(?i)\bexemplified\b", "showed"),
+        (r"(?i)\bnotwithstanding\b", "despite"),
+        (r"(?i)\bhereinafter\b", "from here on"),
+        (r"(?i)\binsofar as\b", "as far as"),
+        (r"(?i)\bwherein\b", "where"),
+        (r"(?i)\bthereby\b", "by doing this"),
+        (r"(?i)\bwhereas\b", "while"),
+    ]
+    for pattern, repl in voc_rules:
+        if callable(repl):
+            text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
+        else:
+            text = _re.sub(pattern, repl, text)
 
-    # smart double quotes -> straight
-    text = _re.sub(r'[\u201C\u201D\u201E\u00AB\u00BB]', '"', text)
+    # ── 3) AI FILLER PHRASES -> removed or simplified ──
+    ph_rules = [
+        (r"(?i)\bIt is important to note that\s*", ""),
+        (r"(?i)\bIt should be noted that\s*", ""),
+        (r"(?i)\bIt is worth mentioning that\s*", ""),
+        (r"(?i)\bIt is worth noting that\s*", ""),
+        (r"(?i)\bIt goes without saying that?\s*", ""),
+        (r"(?i)\bNeedless to say,?\s*", ""),
+        (r"(?i)\bin order to\b", "to"),
+        (r"(?i)\bdue to the fact that\b", "because"),
+        (r"(?i)\ba wide range of\b", "many"),
+        (r"(?i)\ba plethora of\b", "many"),
+        (r"(?i)\bplays a (?:crucial|vital|key|important|significant) role\b", "matters a lot"),
+        (r"(?i)\bin today'?s rapidly evolving\b", "in today's"),
+        (r"(?i)\bin the ever-changing landscape of\b", "in"),
+        (r"(?i)\bat the present time\b", "now"),
+        (r"(?i)\bat this point in time\b", "now"),
+        (r"(?i)\bin the realm of\b", "in"),
+        (r"(?i)\bfor the purpose of\b", "for"),
+        (r"(?i)\bin the event that\b", "if"),
+        (r"(?i)\bprior to\b", "before"),
+        (r"(?i)\bsubsequent to\b", "after"),
+        (r"(?i)\bin conjunction with\b", "with"),
+        (r"(?i)\bon the basis of\b", "based on"),
+        (r"(?i)\bin the absence of\b", "without"),
+        (r"(?i)\bhas the potential to\b", "can"),
+        (r"(?i)\bis capable of\b", "can"),
+        (r"(?i)\ba considerable amount of\b", "a lot of"),
+        (r"(?i)\bthe vast majority of\b", "most"),
+        (r"(?i)\bin close proximity to\b", "near"),
+        (r"(?i)\bat this juncture\b", "now"),
+    ]
+    for pattern, repl in ph_rules:
+        text = _re.sub(pattern, repl, text)
 
-    # smart single quotes -> straight apostrophe
-    text = _re.sub(r"[\u2018\u2019\u201A\u201B\u2039\u203A]", "'", text)
+    # ── 4) CONTRACTIONS ──
+    c_rules = [
+        (r"\bdoes not\b", "doesn't"), (r"\bDoes not\b", "Doesn't"),
+        (r"\bdo not\b", "don't"), (r"\bDo not\b", "Don't"),
+        (r"\bdid not\b", "didn't"), (r"\bDid not\b", "Didn't"),
+        (r"\bis not\b", "isn't"), (r"\bIs not\b", "Isn't"),
+        (r"\bare not\b", "aren't"), (r"\bAre not\b", "Aren't"),
+        (r"\bwas not\b", "wasn't"), (r"\bWas not\b", "Wasn't"),
+        (r"\bwere not\b", "weren't"), (r"\bWere not\b", "Weren't"),
+        (r"\bcannot\b", "can't"), (r"\bCannot\b", "Can't"),
+        (r"\bcould not\b", "couldn't"), (r"\bCould not\b", "Couldn't"),
+        (r"\bwould not\b", "wouldn't"), (r"\bWould not\b", "Wouldn't"),
+        (r"\bwill not\b", "won't"), (r"\bWill not\b", "Won't"),
+        (r"\bshould not\b", "shouldn't"), (r"\bShould not\b", "Shouldn't"),
+        (r"\bit is\b", "it's"), (r"\bIt is\b", "It's"),
+        (r"\bthat is\b", "that's"), (r"\bThat is\b", "That's"),
+        (r"\bthere is\b", "there's"), (r"\bThere is\b", "There's"),
+        (r"\bwhat is\b", "what's"), (r"\bWhat is\b", "What's"),
+        (r"\bthey are\b", "they're"), (r"\bThey are\b", "They're"),
+        (r"\bwe are\b", "we're"), (r"\bWe are\b", "We're"),
+        (r"\byou are\b", "you're"), (r"\bYou are\b", "You're"),
+        (r"\bI am\b", "I'm"), (r"\bI have\b", "I've"),
+        (r"\bI would\b", "I'd"), (r"\bI will\b", "I'll"),
+        (r"\bwe have\b", "we've"), (r"\bWe have\b", "We've"),
+        (r"\bthey have\b", "they've"), (r"\bThey have\b", "They've"),
+        (r"\bwho is\b", "who's"), (r"\bWho is\b", "Who's"),
+        (r"\bwhere is\b", "where's"), (r"\bWhere is\b", "Where's"),
+        (r"\bhe is\b", "he's"), (r"\bHe is\b", "He's"),
+        (r"\bshe is\b", "she's"), (r"\bShe is\b", "She's"),
+        (r"\bhave not\b", "haven't"), (r"\bHave not\b", "Haven't"),
+        (r"\bhas not\b", "hasn't"), (r"\bHas not\b", "Hasn't"),
+        (r"\blet us\b", "let's"), (r"\bLet us\b", "Let's"),
+    ]
+    for pattern, repl in c_rules:
+        text = _re.sub(pattern, repl, text)
 
-    # ellipsis character -> three dots
-    text = text.replace("\u2026", "...")
+    # ── 5) SENTENCE OPENER VARIATION ──
+    def _vary_opener(m):
+        if random.random() < 0.10:
+            prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet "])
+            return m.group(1) + prefix + m.group(2).lower()
+        return m.group(0)
+    text = _re.sub(r"(\. )([A-Z])", _vary_opener, text)
 
-    # bullets -> hyphen
-    text = _re.sub(r"[\u2022\u25E6\u00B7\u2219]", "-", text)
+    # ── 6) SPLIT LONG SENTENCES AT CONJUNCTIONS ──
+    parts = _re.split(r"(?<=[.!?])\s+", text)
+    rebuilt = []
+    for s in parts:
+        wc = len(s.split())
+        if wc > 25 and random.random() < 0.45:
+            split_done = False
+            for conj in [" and ", " but ", " while ", " although ", " because "]:
+                idx = s.find(conj, max(10, len(s) // 3))
+                if idx > 0:
+                    first = s[:idx].rstrip()
+                    if not first.endswith((".", "!", "?")):
+                        first += "."
+                    second = s[idx + len(conj):].strip()
+                    if second and len(second.split()) > 3:
+                        second = second[0].upper() + second[1:]
+                        rebuilt.append(first)
+                        rebuilt.append(second)
+                        split_done = True
+                    break
+            if not split_done:
+                rebuilt.append(s)
+        else:
+            rebuilt.append(s)
+    text = " ".join(rebuilt)
 
-    # 6) Remove emojis
+    # ── 7) INFORMAL DISCOURSE MARKERS ──
+    def _inject_marker(m):
+        if random.random() < 0.10:
+            marker = _pick([
+                "Honestly, ", "Frankly, ", "To be fair, ",
+                "In a way, ", "Actually, ", "Really, ",
+                "Look, ", "The thing is, ", "Truth be told, ",
+                "Granted, ", "Admittedly, ", "Interestingly, ",
+            ])
+            return m.group(1) + marker + m.group(2).lower()
+        return m.group(0)
+    text = _re.sub(r"(\. )([A-Z])", _inject_marker, text)
+
+    # ── 8) HEDGING LANGUAGE ──
+    def _hedge(m):
+        if random.random() < 0.06:
+            h = _pick(["quite ", "fairly ", "rather ", "pretty ", "somewhat "])
+            return h + m.group(0)
+        return m.group(0)
     text = _re.sub(
-        r"[\u00A9\u00AE\u2000-\u3300]|"
-        r"[\U0001F000-\U0001F9FF]",
-        "", text
+        r"\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex)\b",
+        _hedge, text
     )
 
-    # 7) Spaces before punctuation
-    text = _re.sub(r"\s+([.,!?;:])", r"\1", text)
+    # ── 9) PERSONAL VOICE TOUCHES ──
+    pv_rules = [
+        (r"(?i)\bIt can be argued that\b", lambda: _pick(["You could say", "One might say"])),
+        (r"(?i)\bOne can observe that\b", lambda: _pick(["You can see that", "It's clear that"])),
+        (r"(?i)\bIt is evident that\b", lambda: _pick(["Clearly,", "Obviously,"])),
+        (r"(?i)\bIt is clear that\b", lambda: _pick(["Clearly,", "Obviously,"])),
+        (r"(?i)\bIt is apparent that\b", lambda: _pick(["Clearly,", "Obviously,"])),
+        (r"(?i)\bIt can be seen that\b", lambda: _pick(["You can see", "We can see"])),
+        (r"(?i)\bIt is noteworthy that\b", lambda: _pick(["Worth noting,", "Interestingly,"])),
+    ]
+    for pattern, replacer in pv_rules:
+        text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
 
-    # 8) Whitespace normalization
+    # ── 10) ADVERB VARIATION ──
+    adv_rules = [
+        (r"(?i)\bconsiderably\b", lambda: _pick(["a lot", "quite a bit", "noticeably"])),
+        (r"(?i)\bremarkably\b", lambda: _pick(["surprisingly", "really"])),
+        (r"(?i)\bparticularly\b", lambda: _pick(["especially", "mainly"])),
+        (r"(?i)\bprimarily\b", lambda: _pick(["mainly", "mostly", "chiefly"])),
+        (r"(?i)\bfundamentally\b", lambda: _pick(["at its core", "basically", "at heart"])),
+        (r"(?i)\bincreasingly\b", lambda: _pick(["more and more", "progressively"])),
+        (r"(?i)\bcritically\b", lambda: _pick(["crucially", "vitally"])),
+        (r"(?i)\bsystematically\b", lambda: _pick(["step by step", "methodically"])),
+        (r"(?i)\beffectively\b", lambda: _pick(["well", "in practice", "successfully"])),
+        (r"(?i)\bconsequently\b", lambda: _pick(["so", "as a result"])),
+        (r"(?i)\baccordingly\b", lambda: _pick(["so", "for that reason"])),
+    ]
+    for pattern, replacer in adv_rules:
+        text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
+
+    # ── 11) PASSIVE -> ACTIVE VOICE HINTS ──
+    pv2_rules = [
+        (r"(?i)\bwas conducted\b", lambda: _pick(["took place", "happened", "was done"])),
+        (r"(?i)\bwere conducted\b", lambda: _pick(["took place", "happened"])),
+        (r"(?i)\bwas observed\b", lambda: _pick(["showed up", "came through", "was noticed"])),
+        (r"(?i)\bwas identified\b", lambda: _pick(["stood out", "came up", "was spotted"])),
+        (r"(?i)\bwere identified\b", lambda: _pick(["stood out", "came up"])),
+        (r"(?i)\bis characterized by\b", lambda: _pick(["stands out for", "is known for"])),
+        (r"(?i)\bare characterized by\b", lambda: _pick(["stand out for", "are known for"])),
+    ]
+    for pattern, replacer in pv2_rules:
+        text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
+
+    return text
+
+
+def ai_text_clean(text):
+    text = _ud.normalize("NFKC", text)
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = _re.sub(r"[\u200B\u200C\u200D\u2060\uFEFF\u180E]", "", text)
+    text = _re.sub(r"[\u00A0\u2007\u202F\u2009\u200A]", " ", text)
+    text = _re.sub(r"[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]", "", text)
+    text = _re.sub(r"[\u2013\u2014\u2212]", "-", text)
+    text = _re.sub(r'[\u201C\u201D\u201E\u00AB\u00BB]', '"', text)
+    text = _re.sub(r"[\u2018\u2019\u201A\u201B\u2039\u203A]", "'", text)
+    text = text.replace("\u2026", "...")
+    text = _re.sub(r"[\u2022\u25E6\u00B7\u2219]", "-", text)
+    text = _re.sub(
+        r"[\u00A9\u00AE\u2000-\u3300]|[\U0001F000-\U0001F9FF]",
+        "", text
+    )
+    text = _re.sub(r"\s+([.,!?;:])", r"\1", text)
     text = _re.sub(r"[ \t]*\n[ \t]*", "\n", text)
     text = _re.sub(r"[ \t]{2,}", " ", text)
     text = _re.sub(r"\n{3,}", "\n\n", text)
     text = "\n".join(line.rstrip() for line in text.split("\n"))
     text = text.strip()
-
     return text
 
 
+# Apply BOTH humanizer and cleaner to all paragraphs
+humanized_count = 0
 cleaned_count = 0
 
-# Clean ALL paragraphs in the entire document (chapters + everything)
+rewrite_zone_indices = set(ALL_REWRITES.keys())
+
 for para in doc.paragraphs:
     for run in para.runs:
-        if run.text:
+        if run.text and run.text.strip():
+            original = run.text
+            run.text = humanize_text(run.text)
+            if run.text != original:
+                humanized_count += 1
             original = run.text
             run.text = ai_text_clean(run.text)
             if run.text != original:
                 cleaned_count += 1
 
-# Clean ALL table cells in the entire document
 for table in doc.tables:
     for row in table.rows:
         for cell in row.cells:
             for p in cell.paragraphs:
                 for run in p.runs:
-                    if run.text:
+                    if run.text and run.text.strip():
+                        original = run.text
+                        run.text = humanize_text(run.text)
+                        if run.text != original:
+                            humanized_count += 1
                         original = run.text
                         run.text = ai_text_clean(run.text)
                         if run.text != original:
                             cleaned_count += 1
 
+print(f"Humanizer applied to {humanized_count} text runs")
 print(f"AI text cleaning applied to {cleaned_count} text runs")
 
 # ===========================================================

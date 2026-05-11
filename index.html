@@ -81,6 +81,9 @@
       <label title="When pasting/processing the cleaned text will be copied to the clipboard">
         <input type="checkbox" id="autoCopy" checked /> Auto-copy
       </label>
+      <label title="Replace AI-common vocabulary and sentence patterns with natural human alternatives">
+        <input type="checkbox" id="humanize" checked /> Humanize (reduce AI footprint)
+      </label>
       <button id="pasteBtn" class="primary" title="Read text directly from the clipboard">Paste from clipboard</button>
       <button id="processBtn" class="primary" title="Clean text from the left field and copy the result">Process now (Ctrl/⌘+Enter)</button>
       <button id="copyBtn" title="Copy the result to the clipboard">Copy result</button>
@@ -93,6 +96,8 @@
       Removed: zero-width/BOM, NBSP/thin spaces, control characters; typography (— → -, “ ” → ", … → ...),
       markers/bullets; <strong>Markdown bold/italic, heading #, decorative lines, extra *</strong>; pseudographics;
       escaping <code>\$</code>.
+      <strong>Humanizer</strong>: replaces AI transitions, simplifies formal vocabulary, removes filler phrases,
+      applies contractions, varies sentence openers.
     </div>
   </div>
 
@@ -305,6 +310,287 @@
       return { text, stats };
     }
 
+    // --- Humanizer: reduce AI detection patterns ---
+    function humanizeText(input){
+      const stats = [];
+      let text = String(input);
+      let _s = 42;
+      function rand(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
+      function pick(a){ return a[Math.floor(rand() * a.length)]; }
+
+      // 1) Transition words AI overuses
+      let tc = 0;
+      const trRules = [
+        [/\bFurthermore,?\s/g, ()=>pick(['Also, ','Plus, ','And ','Besides, '])],
+        [/\bMoreover,?\s/g, ()=>pick(['Also, ',"What's more, ",'And ','Plus, '])],
+        [/\bAdditionally,?\s/g, ()=>pick(['Also, ','Plus, ','And ','Besides, '])],
+        [/\bConsequently,?\s/g, ()=>pick(['So, ','As a result, ',"That's why "])],
+        [/\bNevertheless,?\s/g, ()=>pick(['Still, ','Even so, ','That said, ','But '])],
+        [/\bNonetheless,?\s/g, ()=>pick(['Still, ','Even so, ','Yet, '])],
+        [/\bSubsequently,?\s/g, ()=>pick(['Then, ','After that, ','Later, '])],
+        [/\bConversely,?\s/g, ()=>pick(['On the flip side, ','Then again, ','But '])],
+        [/\bUltimately,?\s/g, ()=>pick(['In the end, ','When all is said and done, '])],
+        [/\bIn\s+addition,?\s/gi, ()=>pick(['Also, ','Plus, ','And '])],
+        [/\bAs\s+a\s+result,?\s/gi, ()=>pick(['So, ','Because of this, '])],
+        [/\bIn\s+particular,?\s/gi, ()=>pick(['Especially, ','Mainly, '])],
+        [/\bSpecifically,?\s/gi, ()=>pick(['In particular, ','Namely, ','That is, '])],
+        [/\bAccordingly,?\s/gi, ()=>pick(['So, ','For that reason, '])],
+        [/\bHence,?\s/gi, ()=>pick(['So, ',"That's why "])],
+        [/\bThus,?\s/gi, ()=>pick(['So, ','This way, '])],
+      ];
+      for(const [re,fn] of trRules){
+        text = text.replace(re, ()=>{ tc++; return fn(); });
+      }
+      if(tc) stats.push(['Transition words humanized', tc]);
+
+      // 2) Formal vocabulary -> simpler words
+      let vc = 0;
+      const vocRules = [
+        [/\butilize(s?)\b/gi,(m,s)=>s?'uses':'use'],
+        [/\butilized\b/gi,'used'],[/\butilizing\b/gi,'using'],
+        [/\bfacilitate(s?)\b/gi,(m,s)=>s?'helps':'help'],
+        [/\bfacilitated\b/gi,'helped'],[/\bfacilitating\b/gi,'helping'],
+        [/\bdemonstrate(s?)\b/gi,(m,s)=>s?'shows':'show'],
+        [/\bdemonstrated\b/gi,'showed'],[/\bdemonstrating\b/gi,'showing'],
+        [/\bcomprehensive\b/gi,()=>pick(['thorough','complete','full'])],
+        [/\bsignificantly\b/gi,()=>pick(['greatly','noticeably','a lot'])],
+        [/\bsignificant\b/gi,()=>pick(['big','major','notable'])],
+        [/\bsubstantially\b/gi,()=>pick(['greatly','largely','considerably'])],
+        [/\bsubstantial\b/gi,()=>pick(['big','large','considerable'])],
+        [/\bapproximately\b/gi,()=>pick(['about','around','roughly'])],
+        [/\bnumerous\b/gi,()=>pick(['many','several','quite a few'])],
+        [/\boptimal\b/gi,()=>pick(['best','ideal'])],
+        [/\benhance(s?)\b/gi,(m,s)=>s?'improves':'improve'],
+        [/\benhanced\b/gi,'improved'],[/\benhancing\b/gi,'improving'],
+        [/\bleverage(s?)\b/gi,(m,s)=>s?'uses':'use'],
+        [/\bleveraging\b/gi,'using'],[/\bleveraged\b/gi,'used'],
+        [/\bensure(s?)\b/gi,(m,s)=>s?'makes sure':'make sure'],
+        [/\bensuring\b/gi,'making sure'],
+        [/\bpivotal\b/gi,()=>pick(['key','central','important'])],
+        [/\bmultifaceted\b/gi,()=>pick(['complex','varied'])],
+        [/\bstreamline(s?)\b/gi,(m,s)=>s?'simplifies':'simplify'],
+        [/\bstreamlining\b/gi,'simplifying'],
+        [/\bparamount\b/gi,()=>pick(['top priority','most important'])],
+        [/\brobust\b/gi,()=>pick(['strong','solid','reliable'])],
+        [/\bseamlessly\b/gi,'smoothly'],[/\bseamless\b/gi,'smooth'],
+        [/\binnovative\b/gi,()=>pick(['new','creative','fresh'])],
+        [/\bholistic\b/gi,()=>pick(['overall','whole','complete'])],
+        [/\bparadigm(s?)\b/gi,(m,s)=>s?'models':'model'],
+        [/\bmethodologies\b/gi,'methods'],
+        [/\bunderscore(s?)\b/gi,(m,s)=>s?'highlights':'highlight'],
+        [/\bunderscoring\b/gi,'highlighting'],
+        [/\bendeavor(s?)\b/gi,(m,s)=>s?'efforts':'effort'],
+        [/\baugment(s?)\b/gi,(m,s)=>s?'boosts':'boost'],
+        [/\baugmenting\b/gi,'boosting'],
+        [/\bmitigate(s?)\b/gi,(m,s)=>s?'reduces':'reduce'],
+        [/\bmitigating\b/gi,'reducing'],[/\bmitigation\b/gi,'reduction'],
+        [/\bascertain(s?)\b/gi,(m,s)=>s?'finds out':'find out'],
+        [/\bascertained\b/gi,'found out'],
+        [/\bcommence(s?)\b/gi,(m,s)=>s?'starts':'start'],
+        [/\bcommenced\b/gi,'started'],[/\bcommencing\b/gi,'starting'],
+        [/\bterminate(s?)\b/gi,(m,s)=>s?'ends':'end'],
+        [/\bterminated\b/gi,'ended'],
+        [/\bexpedit(e|es)\b/gi,(m,s)=>s==='es'?'speeds up':'speed up'],
+        [/\bexpediting\b/gi,'speeding up'],
+        [/\brequisite\b/gi,'needed'],
+        [/\bpredominantly\b/gi,()=>pick(['mostly','mainly'])],
+        [/\bpredominant\b/gi,()=>pick(['main','primary'])],
+        [/\bcorroborate(s?)\b/gi,(m,s)=>s?'backs up':'back up'],
+        [/\bcorroborating\b/gi,'backing up'],
+        [/\belucidated?\b/gi,'explained'],
+        [/\belucidating\b/gi,'explaining'],
+        [/\bameliorate(s?)\b/gi,(m,s)=>s?'improves':'improve'],
+        [/\bamelioration\b/gi,'improvement'],
+        [/\bdelineate(s?)\b/gi,(m,s)=>s?'outlines':'outline'],
+        [/\bdelineating\b/gi,'outlining'],
+        [/\bpropensity\b/gi,'tendency'],
+        [/\bdiscernible\b/gi,'noticeable'],
+        [/\bpertaining to\b/gi,'about'],
+        [/\bwith respect to\b/gi,'about'],
+        [/\bwith regard to\b/gi,'about'],
+        [/\bin the context of\b/gi,'in'],
+      ];
+      for(const [re,rep] of vocRules){
+        const b=text;
+        if(typeof rep==='function') text=text.replace(re,(...a)=>{vc++;return rep(...a);});
+        else text=text.replace(re,()=>{vc++;return rep;});
+      }
+      if(vc) stats.push(['Formal vocabulary simplified', vc]);
+
+      // 3) AI filler phrases
+      let pc = 0;
+      const phRules = [
+        [/\bIt is important to note that\s*/gi,''],
+        [/\bIt should be noted that\s*/gi,''],
+        [/\bIt is worth mentioning that\s*/gi,''],
+        [/\bIt is worth noting that\s*/gi,''],
+        [/\bIt goes without saying that?\s*/gi,''],
+        [/\bNeedless to say,?\s*/gi,''],
+        [/\bin order to\b/gi,'to'],
+        [/\bdue to the fact that\b/gi,'because'],
+        [/\ba wide range of\b/gi,'many'],
+        [/\ba plethora of\b/gi,'many'],
+        [/\bplays a (?:crucial|vital|key|important|significant) role\b/gi,'matters a lot'],
+        [/\bin today'?s rapidly evolving\b/gi,"in today's"],
+        [/\bin the ever-changing landscape of\b/gi,'in'],
+        [/\bat the present time\b/gi,'now'],
+        [/\bat this point in time\b/gi,'now'],
+        [/\bin the realm of\b/gi,'in'],
+        [/\bfor the purpose of\b/gi,'for'],
+        [/\bin the event that\b/gi,'if'],
+        [/\bprior to\b/gi,'before'],
+        [/\bsubsequent to\b/gi,'after'],
+        [/\bin conjunction with\b/gi,'with'],
+        [/\bon the basis of\b/gi,'based on'],
+        [/\bin the absence of\b/gi,'without'],
+        [/\bhas the potential to\b/gi,'can'],
+        [/\bis capable of\b/gi,'can'],
+        [/\ba considerable amount of\b/gi,'a lot of'],
+        [/\bthe vast majority of\b/gi,'most'],
+        [/\bin close proximity to\b/gi,'near'],
+        [/\bat this juncture\b/gi,'now'],
+      ];
+      for(const [re,rep] of phRules){
+        const b=text;
+        text=text.replace(re,rep);
+        if(text!==b) pc++;
+      }
+      if(pc) stats.push(['AI filler phrases simplified', pc]);
+
+      // 4) Contractions
+      let cc = 0;
+      const cRules = [
+        [/\bdoes not\b/g,"doesn't"],[/\bDoes not\b/g,"Doesn't"],
+        [/\bdo not\b/g,"don't"],[/\bDo not\b/g,"Don't"],
+        [/\bdid not\b/g,"didn't"],[/\bDid not\b/g,"Didn't"],
+        [/\bis not\b/g,"isn't"],[/\bIs not\b/g,"Isn't"],
+        [/\bare not\b/g,"aren't"],[/\bAre not\b/g,"Aren't"],
+        [/\bwas not\b/g,"wasn't"],[/\bWas not\b/g,"Wasn't"],
+        [/\bwere not\b/g,"weren't"],[/\bWere not\b/g,"Weren't"],
+        [/\bcannot\b/g,"can't"],[/\bCannot\b/g,"Can't"],
+        [/\bcould not\b/g,"couldn't"],[/\bCould not\b/g,"Couldn't"],
+        [/\bwould not\b/g,"wouldn't"],[/\bWould not\b/g,"Wouldn't"],
+        [/\bwill not\b/g,"won't"],[/\bWill not\b/g,"Won't"],
+        [/\bshould not\b/g,"shouldn't"],[/\bShould not\b/g,"Shouldn't"],
+        [/\bit is\b/g,"it's"],[/\bIt is\b/g,"It's"],
+        [/\bthat is\b/g,"that's"],[/\bThat is\b/g,"That's"],
+        [/\bthere is\b/g,"there's"],[/\bThere is\b/g,"There's"],
+        [/\bwhat is\b/g,"what's"],[/\bWhat is\b/g,"What's"],
+        [/\bthey are\b/g,"they're"],[/\bThey are\b/g,"They're"],
+        [/\bwe are\b/g,"we're"],[/\bWe are\b/g,"We're"],
+        [/\byou are\b/g,"you're"],[/\bYou are\b/g,"You're"],
+        [/\bI am\b/g,"I'm"],[/\bI have\b/g,"I've"],
+        [/\bI would\b/g,"I'd"],[/\bI will\b/g,"I'll"],
+        [/\bwe have\b/g,"we've"],[/\bWe have\b/g,"We've"],
+        [/\bthey have\b/g,"they've"],[/\bThey have\b/g,"They've"],
+        [/\bwho is\b/g,"who's"],[/\bWho is\b/g,"Who's"],
+        [/\bwhere is\b/g,"where's"],[/\bWhere is\b/g,"Where's"],
+        [/\bhe is\b/g,"he's"],[/\bHe is\b/g,"He's"],
+        [/\bshe is\b/g,"she's"],[/\bShe is\b/g,"She's"],
+        [/\bhave not\b/g,"haven't"],[/\bHave not\b/g,"Haven't"],
+        [/\bhas not\b/g,"hasn't"],[/\bHas not\b/g,"Hasn't"],
+        [/\blet us\b/g,"let's"],[/\bLet us\b/g,"Let's"],
+      ];
+      for(const [re,rep] of cRules){
+        const b=text;
+        text=text.replace(re,rep);
+        if(text!==b) cc++;
+      }
+      if(cc) stats.push(['Contractions applied', cc]);
+
+      // 5) Sentence opener variation
+      let oc = 0;
+      text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
+        if(rand()<0.10){ oc++; return dot + pick(['And ','But ','So ','Now, ','Still, ','Yet ']) + letter.toLowerCase(); }
+        return m;
+      });
+      if(oc) stats.push(['Sentence openers varied', oc]);
+
+      // 6) Split long sentences at conjunctions
+      let sc = 0;
+      const parts = text.split(/(?<=[.!?])\s+/);
+      const rebuilt = [];
+      for(const s of parts){
+        const wc = s.split(/\s+/).length;
+        if(wc > 25 && rand() < 0.45){
+          let done = false;
+          for(const conj of [' and ',' but ',' while ',' although ',' because ']){
+            const idx = s.indexOf(conj, Math.max(10, Math.floor(s.length/3)));
+            if(idx > 0){
+              let first = s.slice(0,idx).trimEnd();
+              if(!/[.!?]$/.test(first)) first += '.';
+              let second = s.slice(idx+conj.length).trim();
+              if(second && second.split(/\s+/).length > 3){
+                second = second[0].toUpperCase() + second.slice(1);
+                rebuilt.push(first); rebuilt.push(second);
+                sc++; done = true;
+              }
+              break;
+            }
+          }
+          if(!done) rebuilt.push(s);
+        } else { rebuilt.push(s); }
+      }
+      text = rebuilt.join(' ');
+      if(sc) stats.push(['Long sentences split', sc]);
+
+      // 7) Informal discourse markers
+      let mc = 0;
+      text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
+        if(rand()<0.10){ mc++;
+          return dot + pick(['Honestly, ','Frankly, ','To be fair, ','In a way, ','Actually, ',
+            'Really, ','Look, ','The thing is, ','Truth be told, ','Granted, ',
+            'Admittedly, ','Interestingly, ']) + letter.toLowerCase();
+        }
+        return m;
+      });
+      if(mc) stats.push(['Discourse markers added', mc]);
+
+      // 8) Hedging language
+      let hc = 0;
+      text = text.replace(/\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex)\b/gi, (m)=>{
+        if(rand()<0.06){ hc++; return pick(['quite ','fairly ','rather ','pretty ','somewhat '])+m; }
+        return m;
+      });
+      if(hc) stats.push(['Hedging words added', hc]);
+
+      // 9) Adverb variation
+      let ac = 0;
+      const advRules = [
+        [/\bconsiderably\b/gi,()=>pick(['a lot','quite a bit','noticeably'])],
+        [/\bremarkably\b/gi,()=>pick(['surprisingly','really'])],
+        [/\bparticularly\b/gi,()=>pick(['especially','mainly'])],
+        [/\bprimarily\b/gi,()=>pick(['mainly','mostly','chiefly'])],
+        [/\bfundamentally\b/gi,()=>pick(['at its core','basically','at heart'])],
+        [/\bincreasingly\b/gi,()=>pick(['more and more','progressively'])],
+        [/\bsystematically\b/gi,()=>pick(['step by step','methodically'])],
+        [/\beffectively\b/gi,()=>pick(['well','in practice','successfully'])],
+      ];
+      for(const [re,fn] of advRules){
+        const b=text;
+        text=text.replace(re,()=>{ac++;return fn();});
+      }
+      if(ac) stats.push(['Adverbs simplified', ac]);
+
+      // 10) Passive voice hints
+      let pvc = 0;
+      const pvRules = [
+        [/\bwas conducted\b/gi,()=>pick(['took place','happened','was done'])],
+        [/\bwere conducted\b/gi,()=>pick(['took place','happened'])],
+        [/\bwas observed\b/gi,()=>pick(['showed up','came through','was noticed'])],
+        [/\bwas identified\b/gi,()=>pick(['stood out','came up','was spotted'])],
+        [/\bwere identified\b/gi,()=>pick(['stood out','came up'])],
+        [/\bis characterized by\b/gi,()=>pick(['stands out for','is known for'])],
+      ];
+      for(const [re,fn] of pvRules){
+        const b=text;
+        text=text.replace(re,()=>{pvc++;return fn();});
+      }
+      if(pvc) stats.push(['Passive voice humanized', pvc]);
+
+      return { text, stats };
+    }
+
     // --- Clipboard ---
     async function copyToClipboard(str){
       try{
@@ -338,7 +624,12 @@
     // --- Main processing ---
     async function processText(raw, { autoCopy=false } = {}){
       setStatus('Processing…');
-      const { text, stats } = sanitizeText(raw);
+      let { text, stats } = sanitizeText(raw);
+      if (document.getElementById('humanize').checked){
+        const h = humanizeText(text);
+        text = h.text;
+        stats = stats.concat(h.stats);
+      }
       output.value = text;
       renderStats(stats);
 
