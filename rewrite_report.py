@@ -28,1569 +28,1732 @@ def replace_cell_text(table_idx, row_idx, col_idx, new_text):
         first_para.add_run(new_text)
 
 
-# ============================================================
-# CHAPTER 1 — INTRODUCTION  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 1
+# ===========================================================
 
 CHAPTER1 = {
 
 85: (
-    "At its core, Enterprise Resource Planning (ERP) is software that pulls together "
-    "an organization\u2019s data\u2014gathering it, organizing it, and turning it into something "
-    "actionable. What makes these platforms so central to daily work is their ability "
-    "to knit together functions that would otherwise run in silos: from scheduling "
-    "projects and distributing resources to tracking inventory, managing finances, and "
-    "flagging risks. Everything feeds into one shared database, updated in near-real "
-    "time, so that the HR team, the finance department, and the sales floor are all "
-    "looking at exactly the same numbers. That single-source architecture stamps out "
-    "duplicate records and keeps data clean across the board."
+    "Enterprise Resource Planning, or ERP, is essentially business software "
+    "that brings an organization\u2019s scattered data under one roof. It collects "
+    "information, stores it, processes it, and\u2014most importantly\u2014makes it "
+    "usable. Why do companies care so much about ERP? Because without it, "
+    "departments end up hoarding their own spreadsheets and databases, and "
+    "nobody agrees on the numbers. ERP ties together project scheduling, "
+    "budgeting, inventory tracking, HR records, and risk reporting into a "
+    "single platform with a shared database that updates in near-real time. "
+    "Finance sees the same figures as sales. HR pulls from the same employee "
+    "records as payroll. Duplicate entries vanish, and data integrity "
+    "actually becomes achievable\u2014something that\u2019s surprisingly hard to "
+    "pull off when every department runs its own system."
 ),
 
 88: (
-    "For decades, running an enterprise system meant owning the servers, patching the "
-    "hardware, and footing a hefty maintenance bill. That picture has shifted. Cloud "
-    "computing opened the door to ERP platforms hosted off-site, and organizations "
-    "jumped at the chance\u2014drawn by the flexibility to scale up or down, the lighter "
-    "financial burden, and the ease of plugging in complementary tools like CRM and "
-    "SCM software. Cross-team collaboration, once hampered by disconnected systems, "
-    "became far more natural."
+    "There was a time\u2014not that long ago, really\u2014when enterprise software "
+    "meant buying physical servers, racking them in a basement or a rented "
+    "data centre, and hiring people to keep them running around the clock. "
+    "Expensive? Enormously. But cloud computing changed the equation. "
+    "Organizations started migrating their ERP to hosted environments, "
+    "attracted by elastic scaling, lower upfront spending, and the ability "
+    "to plug in CRM and supply chain tools without painful custom "
+    "integrations. Collaboration across departments got easier almost "
+    "overnight\u2014and honestly, it\u2019s hard to see why any company wouldn\u2019t "
+    "at least consider making the switch at this point."
 ),
 
-89: "What sets cloud ERP apart? A handful of defining traits:",
+89: "Cloud ERP stands apart because of a few core traits:",
 
-90: "One place for data\u2014shared across every department in the company.",
+90: "All departmental data lives in one centralized repository.",
 
-91: "Log in from anywhere, on any device, through the cloud.",
+91: "Users can log in from a browser, anywhere with internet.",
 
-92: "Scale resources up or down as the business demands it.",
+92: "Capacity grows or shrinks based on what the business actually needs.",
 
-93: "Drastically lower spending on hardware and day-to-day operations.",
+93: "Hardware bills and maintenance overheads drop significantly.",
 
 94: (
-    "Today, cloud ERP sits at the heart of most digital business playbooks. "
-    "Automated backups and built-in disaster recovery give organizations peace of "
-    "mind that their data will survive even the worst outage, making the whole "
-    "platform noticeably more dependable."
+    "In most digital strategies today, cloud ERP occupies a central spot. "
+    "Regular automated backups and built-in disaster recovery go a long way "
+    "toward keeping data safe\u2014something that was far harder to guarantee "
+    "with on-premises setups where a single hardware failure could cause "
+    "serious damage."
 ),
 
 95: (
-    "Artificial Intelligence (AI) takes cloud ERP a step further. Routine tasks get "
-    "automated, predictive models surface patterns human analysts might miss, and "
-    "decision-makers receive real-time dashboards instead of stale weekly reports. "
-    "On the risk side, AI tightens fraud detection, hardens data security, and "
-    "keeps compliance on track\u2014turning the ERP into a smarter, more resilient "
-    "backbone for the entire enterprise."
+    "Then there\u2019s Artificial Intelligence. AI pushes cloud ERP beyond "
+    "record-keeping into territory that was science fiction a decade ago: "
+    "automated routine tasks, predictive analytics that flag problems "
+    "before they escalate, and dashboards that update in real time rather "
+    "than once a week. On the security front, AI tightens fraud detection "
+    "and compliance monitoring. The overall effect? A system that isn\u2019t "
+    "just faster but genuinely smarter\u2014and that\u2019s a big deal for "
+    "organizations drowning in data they can\u2019t make sense of quickly enough."
 ),
 
 97: (
-    "Cloud Computing and AI have redrawn the map for enterprise information systems. "
-    "Conventional on-premises ERP\u2014with its heavy infrastructure bills and constant "
-    "upkeep\u2014is steadily losing ground to cloud alternatives that promise a lighter, "
-    "more agile operating model."
+    "It is hard to overstate how much Cloud Computing and AI have reshaped "
+    "enterprise software. The old model\u2014buy servers, hire technicians, "
+    "pray nothing breaks on a Friday evening\u2014is giving way to cloud "
+    "subscriptions that cost less and deliver more. Companies that clung "
+    "to on-premises ERP are finding the maintenance bills and infrastructure "
+    "headaches increasingly difficult to justify."
 ),
 
 98: (
-    "Three service models dominate the cloud ERP landscape: SaaS, PaaS, and IaaS. "
-    "Regardless of the model, the appeal is the same\u2014faster deployment, tighter "
-    "budget control, and access from virtually anywhere. The numbers back this up: "
-    "cloud ERP usage climbed from 44% in 2020 to roughly 70% by 2026 (Anchor "
-    "Group, 2024; Global Growth Insights, 2025)."
+    "Cloud ERP comes in three flavours: SaaS, PaaS, and IaaS. Each one "
+    "offers a different balance of control and convenience, but the appeal "
+    "across all three is similar\u2014quicker setup, tighter budgets, and "
+    "access from practically anywhere. The adoption curve tells its own "
+    "story: cloud ERP usage jumped from 44 percent in 2020 to close to "
+    "70 percent by 2026 (Anchor Group, 2024; Global Growth Insights, 2025)."
 ),
 
 99: (
-    "A consulting firm like Keystone Advisory Group in Bangalore lives and dies by "
-    "operational effectiveness. When the internal system stumbles\u2014slow reports, "
-    "remote-access headaches, expensive patches\u2014client service quality takes the "
-    "hit. Keystone depends on its ERP for project tracking, invoicing, workforce "
-    "scheduling, and client deliverables. Legacy hurdles like steep capital costs, "
-    "labyrinthine maintenance, and poor off-site access make the argument for "
-    "migrating to cloud ERP hard to ignore."
+    "For a consulting firm like Keystone Advisory Group, headquartered in "
+    "Bangalore, the stakes around operational effectiveness are unusually "
+    "high. When internal systems lag\u2014slow invoices, clunky project "
+    "tracking, unreliable remote access\u2014the quality of client work "
+    "suffers directly. Keystone uses its ERP for billing, workforce "
+    "scheduling, project management, and client reporting. And the "
+    "problems with the legacy setup? High capital costs, convoluted "
+    "maintenance, and an inability to work reliably outside the office. "
+    "Those issues alone make a compelling case for moving to the cloud."
 ),
 
 101: (
-    "Small and Medium Enterprises (SMEs) power a significant share of both the "
-    "Indian and the global economy. Inside India, the competitive landscape for "
-    "SMEs shifts fast; those that cannot manage operations efficiently fall behind "
-    "quickly. Digital transformation is no longer optional\u2014firms need sharper "
-    "analytics, leaner workflows, and faster decisions just to stay in the race. "
-    "Modern ERP platforms give SMEs exactly that toolkit."
+    "SMEs\u2014Small and Medium Enterprises\u2014are the backbone of India\u2019s "
+    "economy and a major force globally. The competitive pressure on Indian "
+    "SMEs is intense and accelerating. Digital transformation is no longer "
+    "something companies do when they get around to it; it is a survival "
+    "requirement. Sharper analytics, leaner operations, faster "
+    "decision-making\u2014modern ERP platforms deliver exactly these things, "
+    "and SMEs that ignore them risk falling behind competitors who do not."
 ),
 
 102: (
-    "The vendor landscape is varied. SAP S/4HANA Cloud serves sprawling multinationals "
-    "with intricate global operations. Oracle Fusion Cloud ERP leans toward mid-to-large "
-    "companies, especially in financial services and HR. Firms already deep in the "
-    "Microsoft stack gravitate toward Dynamics 365. Smaller enterprises on a tighter "
-    "budget often look at Zoho ERP or Oracle NetSuite\u2014both cloud-native, both "
-    "priced for leaner organizations."
+    "The vendor landscape is crowded. SAP S/4HANA Cloud targets large "
+    "multinationals juggling complex global operations. Oracle Fusion Cloud "
+    "ERP appeals to mid-to-large firms, particularly those in finance and "
+    "human resources. Microsoft Dynamics 365 is a natural fit for "
+    "organizations already invested in the Microsoft ecosystem. And for "
+    "smaller businesses watching their budgets, Zoho ERP and Oracle "
+    "NetSuite offer cloud-native options at a more accessible price point."
 ),
 
 106: (
-    "Cloud infrastructure now underpins the vast majority of new ERP deployments. "
-    "Amazon Web Services (AWS) holds the biggest slice of that infrastructure pie "
-    "(Gartner, 2023), which means picking a provider is no small decision\u2014it "
-    "shapes cost structures, latency, and compliance posture for years to come."
+    "The vast majority of new ERP implementations now sit on cloud "
+    "infrastructure. Amazon Web Services holds the largest market share "
+    "in that space (Gartner, 2023). Choosing which cloud provider to "
+    "build on is a strategic decision with consequences that last years\u2014"
+    "it affects cost structures, data latency, regulatory compliance, "
+    "and vendor lock-in."
 ),
 
 107: (
-    "India\u2019s cloud market has its own dynamics. AWS runs its ap-south-1 region out "
-    "of Mumbai, giving Indian clients low latency and local data residency. Azure "
-    "operates from Pune through its Central India region; Google Cloud\u2019s asia-south1 "
-    "sits in Mumbai as well. All three keep data on Indian soil\u2014a non-negotiable "
-    "for companies that treat data sovereignty as a boardroom issue."
+    "India\u2019s cloud market has its own characteristics. AWS operates an "
+    "ap-south-1 region in Mumbai, offering Indian customers both data "
+    "residency and low latency. Microsoft Azure runs out of Pune through "
+    "its Central India region. Google Cloud\u2019s asia-south1 region is also "
+    "in Mumbai. All three major providers keep data on Indian soil, which "
+    "matters a great deal for companies where data sovereignty is not "
+    "just a preference but a regulatory obligation."
 ),
 
 108: (
-    "Globally, the cloud ERP market has been on a steep climb. It stood at USD 34.83 "
-    "billion in 2023 and is on track to hit USD 65.89 billion by 2026. Projections "
-    "push that further\u2014USD 110.26 billion by 2030, USD 207.59 billion by 2034. "
-    "What is fuelling this? Scalability, cost savings, anywhere-access, and the "
-    "relentless corporate drive toward digital transformation."
+    "The numbers behind the global cloud ERP market are striking. In 2023, "
+    "the market was valued at USD 34.83 billion. Projections put it at "
+    "USD 65.89 billion by 2026, then USD 110.26 billion by 2030, and a "
+    "staggering USD 207.59 billion by 2034. What is behind this growth? "
+    "Scalability that legacy systems cannot match, cost advantages that "
+    "CFOs appreciate, anywhere-access that employees demand, and a global "
+    "corporate push toward digital transformation that shows no sign "
+    "of slowing."
 ),
 
 111: (
-    "Several signposts confirm just how fast cloud ERP is gaining traction. Between "
-    "60% and 70% of all ERP environments are expected to sit in the cloud by 2026. "
-    "Roughly three out of four brand-new ERP implementations already run there. "
-    "Financially, the payoff is tangible\u2014most companies recoup about half their "
-    "investment inside two to three years. Over half of enterprises are in the "
-    "middle of migrating, and around 60% have active digital transformation "
-    "programmes. Nearly 40% of ERP platforms now embed AI features such as "
-    "automation and predictive analytics (Parsimony, 2025; Anchor Group, 2024; "
-    "Global Growth Insights, 2024)."
+    "A number of data points illustrate just how rapidly cloud ERP is "
+    "gaining ground. By 2026, somewhere between 60 and 70 percent of all "
+    "ERP environments will be cloud-based. About three-quarters of "
+    "brand-new ERP deployments already run in the cloud. Financially, the "
+    "returns are tangible: most organizations recoup roughly half their "
+    "investment within two to three years. More than half of all "
+    "enterprises are actively in the process of migrating, and around "
+    "60 percent have digital transformation programmes underway. Close "
+    "to 40 percent of ERP platforms now incorporate AI features\u2014"
+    "things like automation and predictive analytics that were niche "
+    "capabilities just five years ago (Parsimony, 2025; Anchor Group, "
+    "2024; Global Growth Insights, 2024)."
 ),
 
 114: (
-    "India\u2019s IT and Business Process Management sector accounts for about 7.4% "
-    "of national GDP and employs roughly 5.4 million people. Bangalore\u2014often "
-    "called India\u2019s Silicon Valley\u2014is where much of the technology and consulting "
-    "activity concentrates. In that high-speed environment, outfits like Keystone "
-    "Advisory Group lean on digital tools, cloud ERP included, to stay sharp. "
-    "Keystone is a management-and-technology advisory house headquartered in "
-    "Bangalore, built around guiding companies through digital change."
+    "India\u2019s IT and Business Process Management industry contributes "
+    "about 7.4 percent of the country\u2019s GDP and provides employment to "
+    "roughly 5.4 million people. Bangalore is at the epicentre of this "
+    "activity\u2014people call it the Silicon Valley of India for good "
+    "reason. Companies like Keystone Advisory Group operate in this "
+    "high-pressure environment, and they lean on cloud ERP and other "
+    "digital tools to keep pace. Keystone itself is a management and "
+    "technology advisory firm based in Bangalore, focused on helping "
+    "organizations navigate digital transformation."
 ),
 
 116: (
-    "Operating out of Bangalore, Keystone Advisory Group is a mid-sized firm that "
-    "blends management consulting with technology advisory. Its niche: helping "
-    "businesses retool their operations for a digital-first world."
+    "Keystone Advisory Group is a mid-sized consultancy operating out of "
+    "Bangalore. It sits at the intersection of management consulting and "
+    "technology advisory, with a particular focus on helping businesses "
+    "retool their operations for a digital-first world."
 ),
 
 117: (
-    "Clients come from BFSI, manufacturing, retail, and healthcare. The firm fields "
-    "about 50 professionals across multiple offices and leans on integrated enterprise "
-    "platforms for everything from tracking projects and managing talent to running "
-    "the books and meeting compliance requirements. Strategy consulting, IT advisory, "
-    "digital transformation, and operational excellence round out the service mix."
+    "The firm works with clients across BFSI, manufacturing, retail, and "
+    "healthcare. It employs around 50 professionals spread across multiple "
+    "offices. Internally, integrated enterprise systems handle project "
+    "tracking, talent management, financial reporting, and compliance. "
+    "The service offering includes strategy consulting, IT advisory work, "
+    "digital transformation support, and operational excellence programmes."
 ),
 
-118: "The firm\u2019s service portfolio breaks down into four pillars:",
+118: "Keystone\u2019s services can be grouped into four areas:",
 
-119: "Guiding organizations through digital transformation",
+119: "Advising organizations on digital transformation strategy",
 
-120: "Helping clients adopt cloud-based technologies",
+120: "Supporting clients in adopting cloud-based technologies",
 
-121: "Refreshing and modernizing legacy enterprise platforms",
+121: "Modernizing aging enterprise platforms",
 
-122: "Streamlining and optimizing business workflows",
+122: "Optimizing business processes for efficiency",
 
 123: (
-    "Each service line feeds the same goal: making client organizations quicker on "
-    "their feet and more efficient in how they run digital operations. For students "
-    "of business, Keystone doubles as a living case study\u2014a place where textbook "
-    "theories meet the messiness of real consulting engagements."
+    "All four feed the same objective: helping client organizations "
+    "become faster and more efficient in their digital operations. "
+    "From an academic perspective, Keystone serves as a useful real-world "
+    "example of how business theory plays out in a consulting environment."
 ),
 
 124: (
-    "For more than ten years, Keystone ran on an on-premises SAP ECC system. It "
-    "worked well enough at first, but cracks widened over time: the system could not "
-    "scale easily, maintenance bills kept rising, analytics capabilities were basic "
-    "at best, and staff outside the office had very limited access. Those pain "
-    "points pushed leadership to explore a cloud ERP migration\u2014seeking agility, "
-    "lighter IT overhead, and a platform that fit the firm\u2019s digital ambitions."
+    "For over ten years, Keystone ran its operations on an on-premises "
+    "SAP ECC system. Initially it worked fine. But over time, problems "
+    "piled up: the system could not scale easily, maintenance costs kept "
+    "climbing, analytics capabilities were limited, and remote access was "
+    "patchy at best. Eventually, these accumulated pain points pushed "
+    "leadership to seriously consider migrating to a cloud-based ERP\u2014"
+    "seeking flexibility, lower IT overhead, and alignment with the "
+    "firm\u2019s broader digital ambitions."
 ),
 
 127: (
-    "ERP systems sit at the junction of process integration, efficiency, and "
-    "data-driven decision-making. Keystone Advisory Group built its core operations "
-    "around an on-premise ERP for years. The system met needs once, but evolving "
-    "business realities and newer technology stacks have laid bare its shortcomings."
+    "ERP systems matter because they hold organizations together. They "
+    "integrate processes, improve efficiency, and support better "
+    "decision-making. Keystone Advisory Group has relied on an on-premise "
+    "ERP for its core operations for years now. It served its purpose "
+    "once, but shifts in the business environment and the arrival of "
+    "newer technologies have exposed real weaknesses in the setup."
 ),
 
 128: (
-    "Cloud computing and digital transformation have raised the bar. Organizations "
-    "now need platforms that flex on demand, scale without friction, and deliver "
-    "insights in real time. Traditional on-premises ERP struggles on all three "
-    "fronts, especially in industries that move fast. The result is a growing "
-    "mismatch between what legacy systems can deliver and what the business "
-    "actually requires going forward."
+    "Cloud computing and digital transformation have raised expectations. "
+    "Organizations need systems that adapt quickly, scale without "
+    "friction, and deliver information in real time. Traditional "
+    "on-premises ERP falls short on all three counts, especially in "
+    "fast-moving industries. What results is a widening gap between "
+    "what legacy systems can offer and what the business genuinely "
+    "needs going forward."
 ),
 
 129: (
-    "That mismatch has become impossible to ignore at Keystone as the company "
-    "grows and adopts hybrid work practices. Leadership recognized the need for "
-    "something more agile, more secure, and easier on the budget\u2014prompting a "
-    "serious look at swapping the legacy on-premises ERP for a cloud-hosted "
-    "replacement."
+    "At Keystone, that gap has become hard to overlook. The company "
+    "is growing, hybrid work is the norm, and the old system simply "
+    "was not built for this reality. Leadership saw the need for "
+    "something more agile, more secure, and easier on the budget, "
+    "which prompted a genuine investigation into replacing the legacy "
+    "on-premises ERP with a cloud-hosted alternative."
 ),
 
 131: (
-    "Multiple operational headaches plague Keystone\u2019s current on-premises ERP, "
-    "making a cloud migration not just attractive but necessary."
+    "Several operational problems plague Keystone\u2019s on-premises ERP, "
+    "and together they make the case for migration unavoidable."
 ),
 
 132: (
-    "Costly infrastructure: Running the on-premises stack costs INR 28,000 monthly "
-    "for infrastructure alone, plus another INR 28,000 for maintenance and "
-    "licensing. For a team of 30\u201340 people, those numbers are hard to justify."
+    "Costly infrastructure: The on-premises system eats up INR 28,000 "
+    "per month just for infrastructure, plus another INR 28,000 for "
+    "maintenance and licensing. For a firm with only 30 to 40 employees, "
+    "those numbers are difficult to stomach."
 ),
 
 133: (
-    "Poor remote access: Only users on Keystone\u2019s office LAN can reach the "
-    "system reliably. VPN workarounds are patchy\u2014a real problem for a firm "
-    "that increasingly works in hybrid and remote setups."
+    "Poor remote access: Staff can only access the system from within "
+    "Keystone\u2019s office network. The VPN alternative is unreliable\u2014"
+    "a serious issue given that the firm now operates in hybrid and "
+    "remote configurations."
 ),
 
 134: (
-    "Sluggish scaling: Bringing on new users or spinning up additional modules "
-    "takes four to six weeks\u2014far too slow for a business that needs to adapt "
-    "on shorter notice."
+    "Sluggish scaling: Adding new users or deploying new modules takes "
+    "four to six weeks. In a business that needs to respond quickly to "
+    "changing demands, that delay is crippling."
 ),
 
 135: (
-    "Outdated security: The platform runs on six-year-old software with irregular "
-    "patch cycles. That leaves sensitive client data exposed to breach risks "
-    "that grow with every delayed update."
+    "Outdated security: The platform runs on software that is six years "
+    "old and does not receive patches on any regular schedule. Sensitive "
+    "client data sits behind defences that grow weaker with every "
+    "missed update."
 ),
 
 136: (
-    "Weak integration: Connecting the system to modern analytics engines, AI "
-    "tools, or third-party SaaS products is cumbersome at best. Keystone\u2019s "
-    "ability to draw data-driven insights suffers as a result."
+    "Weak integration: Connecting the system with modern analytics "
+    "engines, AI tools, or third-party SaaS applications is painful. "
+    "That limitation hobbles Keystone\u2019s ability to draw actionable "
+    "insights from its own data."
 ),
 
 137: (
-    "Unreliable uptime: Four unplanned outages hit the firm in the past year, "
-    "all traced to hardware failures, each one disrupting day-to-day operations."
+    "Unreliable uptime: Four unplanned outages hit the firm over the "
+    "past twelve months, all caused by hardware failures, each one "
+    "interrupting day-to-day business."
 ),
 
 138: (
-    "All of this funnels into one core research question: How can Keystone "
-    "Advisory Group pull off a successful migration from its legacy ERP to a "
-    "cloud platform\u2014without sacrificing data integrity, interrupting operations, "
-    "blowing the budget, or losing sight of strategic goals?"
+    "All these issues converge into a single research question: How can "
+    "Keystone Advisory Group migrate from its aging on-premises ERP to a "
+    "cloud-based platform without compromising data integrity, disrupting "
+    "operations, overshooting the budget, or losing alignment with "
+    "strategic objectives?"
 ),
 
 140: (
-    "Why does this study matter? First, it fills a gap. Most cloud ERP research "
-    "focuses on large Western multinationals; very little examines Indian "
-    "management consulting firms. Second, it produces practical takeaways: how "
-    "to spot and neutralize migration risks, how to steer organizational change, "
-    "and how to gauge whether the new system is actually performing. Those "
-    "lessons can sharpen decision-making for any company walking the same path."
+    "This study matters for two reasons. First, the academic literature "
+    "on cloud ERP migration overwhelmingly focuses on large Western "
+    "multinationals. Indian management consulting firms\u2014mid-sized ones "
+    "in particular\u2014barely appear in the conversation. Second, the "
+    "study generates practical lessons: how to identify and defuse "
+    "migration risks, how to manage organizational change during a "
+    "technology transition, and how to tell whether the new system is "
+    "actually delivering on its promises. These insights should help "
+    "any company considering a similar move."
 ),
 
 141: (
-    "Beyond the academic contribution, the study hands Keystone Advisory Group "
-    "a yardstick for measuring its own migration outcomes. Armed with these "
-    "findings, leadership can benchmark the new system\u2019s performance and "
-    "fine-tune operations where the data says fine-tuning is needed."
+    "There is also a direct benefit for Keystone Advisory Group itself. "
+    "The study provides a structured way to measure migration outcomes, "
+    "benchmark the new system\u2019s performance, and pinpoint areas where "
+    "adjustments are needed."
 ),
 
 143: (
-    "Primary Objective: Gauge how moving to cloud ERP reshapes efficiency, "
-    "cost dynamics, and the quality of decision-making at Keystone Advisory Group."
+    "Primary Objective: To understand how cloud ERP adoption affects "
+    "efficiency, costs, and decision-making quality at Keystone "
+    "Advisory Group."
 ),
 
-144: "Several supporting objectives flow from this:",
+144: "Supporting objectives include the following:",
 
 145: (
-    "Probe Keystone\u2019s technical, organizational, and security readiness for "
-    "a cloud migration."
+    "Examine how prepared Keystone is for cloud migration\u2014technically, "
+    "organizationally, and from a security standpoint."
 ),
 
 146: (
-    "Weigh AWS, Azure, and Google Cloud Platform against each other and "
-    "recommend the strongest fit for hosting Keystone\u2019s ERP."
+    "Compare AWS, Azure, and Google Cloud Platform and recommend the "
+    "most suitable option for hosting Keystone\u2019s ERP."
 ),
 
 147: (
-    "Map out a phased migration roadmap complete with risk management "
-    "protocols and fallback plans."
+    "Develop a phased migration roadmap that includes risk management "
+    "protocols and contingency plans."
 ),
 
 148: (
-    "Move data across to the new platform with a firm guarantee of "
-    "100% data integrity in every module."
+    "Execute data migration with a hard guarantee of 100 percent "
+    "data integrity across every module."
 ),
 
 149: (
-    "Put the cloud ERP through its paces\u2014functionality, performance, "
-    "security\u2014and train users on the new workflows."
+    "Test the cloud ERP thoroughly\u2014functionality, performance, "
+    "security\u2014and provide comprehensive user training."
 ),
 
 150: (
-    "Orchestrate a clean go-live and set up a framework that compares "
-    "post-migration KPIs against pre-migration baselines."
+    "Manage a clean go-live and establish a framework for comparing "
+    "post-migration KPIs against the pre-migration baseline."
 ),
 
 151: (
-    "Survey staff on how prepared they felt, what problems they hit, and "
-    "how satisfied they are after the switch."
+    "Survey employees about their preparedness, the difficulties they "
+    "encountered, and their satisfaction after the transition."
 ),
 
 153: (
-    "RQ1: What steps should an organization take to gauge whether it is "
-    "genuinely ready to move its ERP from on-premises servers to a cloud "
-    "platform?"
+    "RQ1: What steps should an organization take to determine whether "
+    "it is genuinely ready to shift its ERP from on-premises servers "
+    "to a cloud-based platform?"
 ),
 
 154: (
-    "Answering this draws on published literature combined with readiness "
-    "assessment frameworks; survey data add an empirical layer by spotlighting "
-    "the readiness factors that matter most."
+    "This question draws on existing literature and readiness assessment "
+    "frameworks. Survey data add an empirical dimension by highlighting "
+    "the readiness factors that weigh most heavily."
 ),
 
 156: (
-    "RQ2: On what grounds should a company pick one cloud platform over "
-    "another when migrating its ERP?"
+    "RQ2: What factors should a company weigh when choosing one cloud "
+    "platform over another for an ERP migration?"
 ),
 
 157: (
-    "A comparative look at the major cloud providers\u2014filtered through "
-    "criteria like cost, scalability, security, and raw performance\u2014provides "
-    "the answer, backed by existing literature."
+    "A comparative review of major cloud vendors\u2014evaluated against "
+    "cost, scalability, security, and performance benchmarks\u2014forms "
+    "the basis of the answer, supported by published research."
 ),
 
 159: (
-    "RQ3: Which migration approach best safeguards data integrity and "
-    "keeps the business running while the ERP shifts to the cloud?"
+    "RQ3: Which migration approach best protects data integrity "
+    "and keeps the business running while the ERP moves to the cloud?"
 ),
 
 160: (
-    "Published migration models and case studies supply the foundation; "
-    "a purpose-built migration framework, mapped to the project\u2019s phases, "
-    "ties the theory to practice."
+    "Case studies and published migration frameworks provide the "
+    "foundation. A purpose-built framework, mapped to the phases of "
+    "this project, bridges theory and practice."
 ),
 
 163: (
-    "RQ4: What are the biggest pitfalls and hazards in a cloud ERP "
-    "migration, and how can an organization work around them?"
+    "RQ4: What are the most significant risks in a cloud ERP "
+    "migration, and what can organizations do to manage them?"
 ),
 
 164: (
-    "Answers come from combing through academic sources, dissecting case "
-    "studies, and applying structured risk tools\u2014SWOT analysis chief "
-    "among them."
+    "The answer is built from academic literature, case study "
+    "analysis, and structured risk-assessment tools, with SWOT "
+    "analysis being the primary instrument."
 ),
 
 166: (
-    "RQ5: Once a cloud ERP goes live, how does it move the needle on "
-    "cost, efficiency, and system uptime?"
+    "RQ5: After a cloud ERP goes live, how does it affect cost, "
+    "operational efficiency, and system reliability?"
 ),
 
 167: (
-    "Secondary data analysis paired with scenario-based modelling, "
-    "benchmarked against industry norms, tackles this question."
+    "Secondary data analysis combined with scenario-based modelling, "
+    "measured against industry benchmarks, addresses this question."
 ),
 
 169: (
-    "RQ6: How do end users perceive the shift to cloud ERP\u2014what is "
-    "their readiness level, and where do adoption hurdles show up?"
+    "RQ6: How do end users feel about the switch to cloud ERP? "
+    "What is their readiness level, and where do adoption barriers "
+    "show up?"
 ),
 
 170: (
-    "Primary data from a structured questionnaire\u2014fielded to students "
-    "serving as proxy respondents\u2014feeds into descriptive statistical "
-    "analysis to answer this."
+    "A structured questionnaire\u2014administered to students acting as "
+    "proxy respondents\u2014supplies the primary data, which is then "
+    "examined through descriptive statistical methods."
 ),
 
 172: (
-    "This study zeroes in on migrating ERP systems from local servers to "
-    "cloud platforms, viewed through the lens of Keystone Advisory Group in "
-    "Bangalore. The analysis covers readiness, cloud vendor selection, the "
-    "migration strategy itself, and how the new system performs once it is "
-    "up and running."
+    "This study focuses specifically on migrating ERP systems from "
+    "local infrastructure to cloud-based platforms, examined through "
+    "the experience of Keystone Advisory Group in Bangalore. The "
+    "analysis spans organizational readiness, cloud vendor selection, "
+    "the migration strategy itself, and post-implementation "
+    "performance."
 ),
 
 173: (
-    "Everything is framed within the Indian business context\u2014taking into "
-    "account domestic industry norms, regulatory guardrails, and the fast-rising "
-    "adoption of cloud technologies by Indian firms. That grounding keeps the "
-    "findings relevant to the conditions companies actually face on the ground."
+    "The entire investigation is framed within the Indian business "
+    "context. Domestic industry norms, regulatory requirements, and "
+    "the growing adoption of cloud technologies among Indian "
+    "organizations all feed into the analysis, keeping the findings "
+    "grounded in conditions that local firms actually face."
 ),
 
 174: (
-    "Cloud service models fall within the study\u2019s lens as well, particularly "
-    "Infrastructure as a Service (IaaS), though other models receive attention "
-    "where they bear on ERP deployment and growth. AWS, Microsoft Azure, and "
-    "Google Cloud Platform are each appraised for their suitability as an "
-    "ERP migration target."
+    "Cloud service models fall within the scope as well\u2014primarily "
+    "Infrastructure as a Service (IaaS), though other models are "
+    "considered where they bear on ERP deployment or scaling. AWS, "
+    "Microsoft Azure, and Google Cloud Platform are each evaluated "
+    "for suitability as ERP migration targets."
 ),
 
 175: (
-    "On the functional side, the study spans Finance, Human Resources, Project "
-    "Management, CRM, Procurement, and Administration modules. It examines how "
-    "a cloud-based ERP tackles the chronic weaknesses of legacy systems\u2014"
-    "excessive costs, poor scalability, restricted access, and cumbersome "
-    "integrations."
+    "Functionally, the study touches Finance, Human Resources, Project "
+    "Management, CRM, Procurement, and Administration modules. It looks "
+    "at how cloud ERP addresses the persistent weaknesses of traditional "
+    "systems: excessive costs, poor scalability, restricted access, and "
+    "cumbersome integration requirements."
 ),
 
 176: (
-    "A 12-week project window (March\u2013June 2026) bounds the work, covering "
-    "planning, vendor selection, migration execution, testing, and post-go-live "
-    "support."
+    "The project operates within a 12-week window running from March "
+    "to June 2026, covering planning, vendor selection, migration "
+    "execution, testing, and post-go-live support."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 2 — LITERATURE REVIEW  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 2
+# ===========================================================
 
 CHAPTER2 = {
 
 181: (
-    "Scholarship on ERP systems has moved well beyond cataloguing features. The "
-    "conversation now centres on measurable outcomes\u2014how these platforms reshape "
-    "workflows, sharpen decisions, and cut waste. A thick strand of the literature "
-    "digs into the way ERP unifies processes that used to run on separate tracks, "
-    "trimming the inefficiencies that creep in when departments operate in isolation."
+    "Research on ERP systems has evolved considerably. Early work focused "
+    "mostly on describing what these systems do. More recent scholarship "
+    "asks a harder question: do they actually improve how organizations "
+    "operate and make decisions? A significant portion of the literature "
+    "examines how ERP brings together business functions that otherwise "
+    "run in isolation, cutting the inefficiencies that pile up when "
+    "departments manage their own processes independently."
 ),
 
 182: (
-    "Cloud computing\u2019s rise has added a new chapter. Academics are probing what "
-    "happens when companies lift their ERP off local servers and drop it into "
-    "platforms from SAP, Oracle, and others. The verdict so far: cloud delivery "
-    "strengthens coordination between departments, automates grunt work, and puts "
-    "live data at everyone\u2019s fingertips."
+    "The rise of cloud computing added an entirely new dimension to the "
+    "conversation. Researchers began studying what happens when companies "
+    "pull their ERP off local servers and move it onto platforms from SAP, "
+    "Oracle, and similar vendors. The findings are broadly positive: cloud "
+    "delivery strengthens inter-departmental coordination, automates "
+    "repetitive tasks, and gives people access to live data rather than "
+    "yesterday\u2019s reports."
 ),
 
 183: (
-    "That said, the literature is not all rosy. Plenty of studies flag real "
-    "downsides\u2014security worries, messy migrations, and employees who simply "
-    "refuse to change how they work. The takeaway? Adopting ERP is never just "
-    "a technology project; it is an organizational shakeup that touches culture, "
-    "habits, and power structures."
+    "But the literature is not all sunshine. A fair number of studies "
+    "document real downsides\u2014security risks, messy data migrations, and "
+    "employees who dig in their heels and refuse to adopt new workflows. "
+    "The lesson here is important: ERP adoption is never just a technology "
+    "project. It disrupts routines, reshuffles power dynamics, and "
+    "challenges organizational culture."
 ),
 
 184: (
-    "Methodologically, the field is diverse. Researchers have leaned on case "
-    "studies, large-scale surveys, and in-depth interviews to understand ERP in "
-    "practice. On the migration front, strategies like phased rollouts and "
-    "parallel-run periods surface repeatedly as ways to keep risk in check "
+    "Methodologically, the field is quite diverse. Case studies, surveys, "
+    "and in-depth interviews have all been used to explore how ERP "
+    "performs in real-world settings. Migration strategies also receive "
+    "considerable attention. Phased rollouts and parallel system "
+    "operations show up repeatedly as practical ways to contain risk "
     "while the old system hands off to the new one."
 ),
 
 185: (
-    "Even with all this work, blind spots remain\u2014particularly around SMEs, "
-    "where tight budgets make ROI a do-or-die metric and operational efficiency "
-    "is not a luxury but a survival requirement. This chapter walks through "
-    "the theoretical bedrock of ERP adoption, catalogues the weak points of "
-    "legacy systems, traces the arc of cloud ERP\u2019s emergence, and sizes up "
-    "what existing research says about migration results, success levers, and "
-    "stumbling blocks. It closes by mapping the gaps this study sets out to fill."
+    "Despite all this work, significant blind spots persist. SMEs, in "
+    "particular, remain underexplored\u2014and for SMEs, achieving a "
+    "reasonable return on investment and keeping operations running "
+    "smoothly are not luxuries but survival requirements. This chapter "
+    "lays out the theoretical groundwork for ERP adoption, catalogues "
+    "the shortcomings of legacy systems, tracks the emergence of "
+    "cloud-based ERP, evaluates published findings on migration "
+    "outcomes and pitfalls, and identifies the research gaps this "
+    "study intends to fill."
 ),
 
 188: (
-    "Nobody migrates an ERP system on a whim. The decision to abandon a legacy "
-    "on-premises setup for a cloud alternative is tangled, touching strategy, "
-    "finance, technology, and people in roughly equal measure. Scholars have "
-    "proposed\u2014and tested\u2014several models to make sense of how organizations "
-    "and individuals adopt new technology."
+    "No organization migrates its ERP casually. The decision to leave "
+    "behind a legacy on-premises system and move to the cloud is tangled "
+    "and multifaceted, touching strategy, budgets, technology, and human "
+    "behaviour in roughly equal measure. Several theoretical models have "
+    "been developed\u2014and empirically tested\u2014to explain how people and "
+    "organizations adopt new technology."
 ),
 
 190: (
-    "Few frameworks in information systems carry as much weight as the Technology "
-    "Acceptance Model. Davis (1989) boiled adoption down to two beliefs: Perceived "
-    "Usefulness (PU)\u2014\u201cWill this make my job better?\u201d\u2014and Perceived Ease of Use "
-    "(PEOU)\u2014\u201cCan I figure this out without a headache?\u201d Those two beliefs feed "
-    "attitudes, which feed intentions, which feed actual use. Simple chain, "
-    "powerful explanation."
+    "The Technology Acceptance Model is probably the most cited framework "
+    "in the information systems literature. What Davis proposed back in "
+    "1989 was fairly straightforward: a person\u2019s willingness to use "
+    "new technology boils down to two perceptions. Perceived Usefulness\u2014"
+    "will this actually make my job better? And Perceived Ease of Use\u2014"
+    "can I figure it out without an unreasonable amount of effort? Those "
+    "two perceptions shape attitudes, attitudes shape intentions, and "
+    "intentions shape actual behaviour. It\u2019s a deceptively simple chain, "
+    "but it\u2019s held up remarkably well across decades of research."
 ),
 
 191: (
-    "The model\u2019s punch line is sobering for IT leaders: a technically brilliant "
-    "cloud ERP that feels clunky to end users will sit idle. People reject "
-    "systems they find hard to use, no matter how many features the spec sheet "
-    "lists. TAM therefore pushes organizations to pour as much effort into "
-    "interface design and hands-on training as they do into server provisioning."
+    "The practical takeaway from TAM isn\u2019t exactly comfortable for IT "
+    "leaders. A cloud ERP system might be technically outstanding, but if "
+    "the people who have to use it every day find it confusing or "
+    "cumbersome, they simply won\u2019t use it properly\u2014no matter what the "
+    "spec sheet says. That\u2019s why usability design and hands-on training "
+    "deserve just as much investment as the technology itself."
 ),
 
 194: (
-    "Venkatesh et al. (2003) folded eight earlier adoption models into one "
-    "unified framework\u2014UTAUT\u2014and distilled them down to four drivers: "
-    "Performance Expectancy, Effort Expectancy, Social Influence, and "
-    "Facilitating Conditions. For large-scale ERP conversions, UTAUT is "
-    "especially relevant because it captures the weight of managerial "
-    "endorsement and infrastructure readiness\u2014forces that often matter more "
-    "than any single user\u2019s personal preference."
+    "Venkatesh and colleagues, writing in 2003, took eight earlier "
+    "adoption models and synthesized them into one unified framework "
+    "called UTAUT. It identifies four core drivers: Performance "
+    "Expectancy, Effort Expectancy, Social Influence, and Facilitating "
+    "Conditions. What makes UTAUT particularly relevant for ERP projects "
+    "is that it explicitly accounts for managerial endorsement and "
+    "infrastructure readiness\u2014two factors that often matter more in "
+    "large-scale deployments than any individual user\u2019s personal "
+    "feelings about the software."
 ),
 
 196: (
-    "Rogers (2003) mapped how new ideas spread through a population, slotting "
-    "people into five buckets: Innovators, Early Adopters, Early Majority, "
-    "Late Majority, and Laggards. For cloud ERP, the model is a useful "
-    "predictor of internal resistance. Tech-savvy consulting firms tend to "
-    "land in the early-majority camp\u2014they wait for proof of concept but "
-    "move before the mainstream catches up. Keystone Advisory Group\u2019s 2024 "
-    "migration timeline fits that pattern neatly."
+    "Rogers (2003) described how innovations spread through populations "
+    "and sorted adopters into five groups: Innovators, Early Adopters, "
+    "Early Majority, Late Majority, and Laggards. Applied to cloud ERP, "
+    "this classification is useful for predicting where internal "
+    "resistance will come from. Technology-oriented consulting firms "
+    "typically sit in the early majority\u2014they adopt innovations after "
+    "proof of concept exists but before mainstream saturation. "
+    "Keystone Advisory Group\u2019s 2024 migration timeline fits this "
+    "pattern closely."
 ),
 
 197: (
-    "Rogers also pinpointed five innovation attributes that speed or slow "
-    "adoption: relative advantage, compatibility, complexity, trialability, "
-    "and observability. Cloud ERP scores well on advantage and trialability\u2014"
-    "vendors happily demo their platforms. Complexity, though, remains a "
-    "sticking point, especially when migrating years of accumulated data."
+    "Rogers also identified five innovation attributes that influence "
+    "adoption speed: relative advantage, compatibility, complexity, "
+    "trialability, and observability. Cloud ERP scores well on advantage "
+    "and trialability\u2014vendors are happy to run demonstrations. But "
+    "complexity remains a real concern, particularly when it comes to "
+    "migrating years of accumulated organizational data."
 ),
 
 199: (
-    "TCO analysis frames the cloud-versus-on-premises debate as a long-haul "
-    "financial exercise. It goes beyond sticker prices\u2014licensing, hardware\u2014and "
-    "folds in implementation, training, maintenance, downtime, and opportunity "
-    "costs. Companies that look only at license fees tend to undercount what "
-    "on-premises really costs them while overstating what the cloud will. "
-    "Gartner (2022) puts numbers to it: over a five-year horizon, cloud ERP "
-    "typically runs 25\u201340% cheaper in aggregate than its on-premises equivalent."
+    "The TCO framework treats the cloud-versus-on-premises decision as "
+    "a comprehensive, long-term financial exercise. It looks beyond "
+    "obvious costs like licenses and hardware to include implementation, "
+    "training, maintenance, downtime, and even opportunity costs. "
+    "Organizations that only compare license fees tend to underestimate "
+    "what on-premises actually costs them while overestimating cloud "
+    "expenses. Gartner (2022) quantifies this: over five years, cloud "
+    "ERP typically costs 25 to 40 percent less than the equivalent "
+    "on-premises deployment when everything is included."
 ),
 
-202: "Johansson & Ruivo (2013)",
+202: "Johansson and Ruivo (2013)",
 
 203: (
-    "Johansson and Ruivo (2013) compared cloud ERP uptake among SMEs in Sweden "
-    "and Portugal. Forty organizations took part in surveys and structured "
-    "interviews. Cost savings and scalability topped the list of motivators; "
-    "data security fears and vendor lock-in topped the list of worries. A "
-    "striking finding: firms with mature IT governance reported noticeably "
-    "higher satisfaction. The catch? A Western-European-SME sample limits how "
-    "far the results travel\u2014particularly to consulting firms in emerging "
-    "markets."
+    "This study compared cloud ERP uptake across SMEs in Sweden and "
+    "Portugal, drawing on surveys and structured interviews at 40 "
+    "organizations. Cost savings and scalability were the strongest "
+    "motivators; data security fears and vendor dependency were the "
+    "most commonly cited barriers. An interesting finding was that "
+    "companies with stronger IT governance reported significantly "
+    "higher satisfaction with their cloud deployments. The limitation "
+    "is geographic\u2014a Western European SME focus that does not "
+    "translate easily to consulting firms in emerging economies."
 ),
 
 204: "Seethamraju (2015)",
 
 205: (
-    "Seethamraju (2015) looked at SaaS ERP inside Australian universities\u2014"
-    "complex, multi-stakeholder organizations by nature. Semi-structured "
-    "interviews with IT directors and process owners across three institutions "
-    "revealed genuine gains in maintainability and upgrade frequency, but "
-    "exposed a tension: cloud platforms offer less room for bespoke "
-    "customization than on-premises installations. For entities tangled in "
-    "regulatory and reporting obligations, that trade-off bites. The finding "
-    "resonates directly with consulting firms, which face their own version "
-    "of the standardization-versus-customization tug-of-war."
+    "Seethamraju examined SaaS-based ERP in Australian universities, "
+    "which are complex, multi-stakeholder institutions by nature. "
+    "Semi-structured interviews with IT directors and process owners "
+    "at three universities revealed real gains in maintainability and "
+    "upgrade frequency. The downside? Cloud platforms offered "
+    "considerably less room for bespoke customization compared to "
+    "on-premises installations. For organizations tangled in "
+    "regulatory and reporting obligations, that trade-off can be "
+    "painful. The finding resonates with consulting firms, which "
+    "face their own version of the customization-versus-standardization "
+    "dilemma."
 ),
 
-206: "Martins et al. (2019)",
+206: "Martins, Au-Yong-Oliveira, and Neto (2019)",
 
 207: (
-    "Martins et al. (2019) tracked cloud ERP migration outcomes at 28 "
-    "multinationals over four years, scoring performance against a balanced "
-    "scorecard. Internal processes and organizational learning showed the "
-    "biggest lifts\u2014process automation jumped, cross-functional data sharing "
-    "improved markedly. Financial payoffs, including TCO reduction, materialized "
-    "mainly in years two and three, hinting at a lag between go-live and full "
-    "ROI realization. Because the study only covered large multinationals, "
-    "mid-sized advisory firms remain off the radar."
+    "This longitudinal study tracked cloud ERP migration at 28 "
+    "multinationals over four years, applying a balanced scorecard "
+    "to evaluate outcomes. Internal processes and organizational "
+    "learning saw the biggest improvements\u2014process automation "
+    "rates went up, cross-functional data sharing improved noticeably. "
+    "Financial benefits, including TCO reduction, appeared mostly in "
+    "years two and three post-migration, suggesting a meaningful lag "
+    "between going live and seeing the full financial return. A "
+    "notable gap: mid-sized advisory firms were not part of the "
+    "sample at all."
 ),
 
-208: "Sagheer et al. (2021)",
+208: "Sagheer and colleagues (2021)",
 
 209: (
-    "Sagheer et al. (2021) surveyed 120 organizations in India, Pakistan, and "
-    "Bangladesh to catalogue barriers to cloud ERP in South Asia\u2019s tech sector. "
-    "Data-privacy worries, skill gaps, and migration costs topped the list. "
-    "An encouraging pattern also emerged: companies that had already dabbled in "
-    "cloud\u2014via a hosted CRM or HRMS, for instance\u2014navigated ERP migration "
-    "with significantly less turbulence. Given its South-Asian focus, the work "
-    "maps closely onto the present study\u2019s context."
+    "Sagheer et al. surveyed 120 organizations across India, Pakistan, "
+    "and Bangladesh to understand what holds back cloud ERP adoption in "
+    "the South Asian technology sector. Data privacy concerns, skill "
+    "shortages, and migration costs emerged as the top three barriers. "
+    "On a more encouraging note, organizations that already had "
+    "experience with cloud platforms\u2014a hosted CRM or HRMS, for "
+    "example\u2014experienced considerably smoother ERP migrations. The "
+    "South Asian focus makes these findings directly relevant to the "
+    "present study."
 ),
 
-210: "Ali et al. (2023)",
+210: "Ali and colleagues (2023)",
 
 211: (
-    "Ali et al. (2023) surveyed 200 IT managers across the Gulf Cooperation "
-    "Council region and built a multidimensional model for judging post-migration "
-    "ERP performance\u2014technical health, user satisfaction, process efficiency, "
-    "and strategic fit. Structural equation modelling identified three standout "
-    "success drivers: executive sponsorship, thorough training, and phased "
-    "rollout. The authors flagged a gap around middle management\u2019s role in "
-    "post-migration adoption\u2014a gap the present study starts to close through "
-    "its own survey design."
+    "Ali et al. surveyed 200 IT managers across the Gulf Cooperation "
+    "Council region and developed a multidimensional model for evaluating "
+    "post-migration ERP performance. The model spans technical health, "
+    "user satisfaction, process efficiency, and strategic alignment. "
+    "Using structural equation modelling, the authors identified three "
+    "key success drivers: executive sponsorship, thorough training "
+    "programmes, and phased rollout strategies. They also flagged a gap "
+    "around the role of middle management in post-migration adoption\u2014"
+    "a gap the current study begins to address through its survey design."
 ),
 
 213: (
-    "On-premises ERP dominated enterprise information management from the 1990s "
-    "onward. SAP R/3, Oracle E-Business Suite, and Microsoft Dynamics NAV were "
-    "the heavyweights of that era. Running these systems meant buying perpetual "
-    "licenses, maintaining physical servers in-house, and keeping an IT team on "
-    "standby for customization, patching, and major upgrades."
+    "On-premises ERP has been the workhorse of enterprise information "
+    "management since the 1990s. SAP R/3, Oracle E-Business Suite, and "
+    "Microsoft Dynamics NAV were the dominant platforms of that generation. "
+    "Running these systems meant purchasing perpetual software licenses, "
+    "maintaining physical servers on-site, and keeping a dedicated IT "
+    "team available for customization, patching, and periodic upgrades."
 ),
 
 214: (
-    "Deep customisability, total data control, and no reliance on an internet "
-    "connection\u2014these strengths cemented on-premises ERP as the go-to choice "
-    "for large, heavily regulated organizations. Manufacturers needing shop-floor "
-    "hooks, banks guarding transactional security, and government bodies requiring "
-    "air-gapped networks all built their operations around locally hosted systems."
+    "On-premises ERP earned its dominance for good reasons: deep "
+    "customisability, total control over data, and independence from "
+    "internet connectivity. Large, heavily regulated organizations "
+    "gravitated toward it\u2014manufacturers needing shop-floor integration, "
+    "banks requiring transactional security, and government agencies "
+    "running air-gapped networks."
 ),
 
 215: (
-    "Ironically, the very qualities that made on-premises ERP effective in a "
-    "slower-moving era now hobble it. Rigid architecture chokes the pace of "
-    "innovation; upgrade cycles stretching into years guarantee that the "
-    "organization is always a step behind the technology curve."
+    "The irony is that the very qualities which made on-premises ERP "
+    "effective in a more stable era now work against it. Rigid "
+    "architecture stifles the pace of innovation. Upgrade cycles "
+    "measured in years guarantee that the organization is always "
+    "trailing the technology curve by a significant margin."
 ),
 
 217: (
-    "Architecturally, on-premises ERP stacks four layers (see Figure 2.2). "
-    "The user layer talks to the application layer only through the corporate "
-    "LAN\u2014anyone working off-site needs a VPN, often an unreliable one. "
-    "Underneath, the infrastructure layer (physical servers, storage arrays, "
-    "databases) is wholly owned and managed by the in-house IT team. Hardware "
-    "swaps, software patches, and capacity upgrades all land on that team\u2019s "
-    "desk, piling up both risk and cost."
+    "On-premises ERP is built on a four-layer stack (see Figure 2.2). "
+    "The user layer connects to the application layer exclusively "
+    "through the corporate LAN. Anyone working off-site needs a VPN, "
+    "which is often unreliable. Below that sits the infrastructure "
+    "layer\u2014physical servers, storage, databases\u2014all owned and "
+    "managed by the in-house IT team. Every hardware replacement, "
+    "every software patch, every capacity expansion lands on that "
+    "team\u2019s desk, piling up both risk and cost."
 ),
 
 222: (
-    "NIST offers the canonical definition: cloud computing is a model for "
-    "on-demand network access to a shared pool of configurable computing "
-    "resources\u2014networks, servers, storage, applications, and services\u2014"
-    "that can be spun up or torn down quickly with minimal hands-on management "
-    "(Mell & Grance, 2011)."
+    "The canonical definition comes from NIST: cloud computing is a "
+    "model for on-demand network access to a shared pool of configurable "
+    "computing resources\u2014servers, storage, networks, applications\u2014"
+    "that can be provisioned and released rapidly with minimal hands-on "
+    "management (Mell and Grance, 2011)."
 ),
 
 223: (
-    "Three properties make cloud computing tick: self-service on demand, broad "
-    "network reach, and rapid elasticity. Together they shatter the time and "
-    "capacity ceilings of on-premises setups. For ERP specifically, the cloud "
-    "rewrites the relationship between an organization and its software\u2014"
-    "swapping ownership for subscription, hands-on management for consumption."
+    "Three characteristics make cloud computing work: self-service on "
+    "demand, broad network accessibility, and rapid elasticity. Together "
+    "they remove the time and capacity constraints that define "
+    "on-premises systems. For ERP, cloud delivery fundamentally changes "
+    "how an organization relates to its software\u2014ownership gives way "
+    "to subscription, and hands-on management gives way to consumption."
 ),
 
 225: (
-    "IaaS hands over virtual servers, storage, and networking on a pay-as-you-go "
-    "basis. The cloud vendor looks after the hardware; the customer keeps control "
-    "of the OS, middleware, and applications. In ERP land, IaaS is the go-to for "
-    "\u201clift and shift\u201d moves\u2014taking the existing on-premises application and "
-    "dropping it onto cloud-hosted VMs without rearchitecting anything. AWS EC2, "
-    "Azure Virtual Machines, and Google Compute Engine are the big names here."
+    "IaaS delivers virtual servers, storage, and networking over the "
+    "internet on a pay-as-you-go basis. The cloud provider handles the "
+    "hardware; the customer controls the operating system, middleware, "
+    "and applications. In ERP contexts, IaaS is commonly chosen for "
+    "lift-and-shift migrations\u2014moving the existing application onto "
+    "cloud-hosted virtual machines without rearchitecting it. AWS EC2, "
+    "Azure Virtual Machines, and Google Compute Engine are the major "
+    "players."
 ),
 
 227: (
-    "PaaS gives developers an internet-based environment for building and "
-    "deploying applications, hiding the infrastructure plumbing beneath an "
-    "abstraction layer. In ERP ecosystems, PaaS is where organizations craft "
-    "custom modules, build integrations, or develop analytics apps that sit on "
-    "top of their cloud ERP. SAP Business Technology Platform (BTP) and Oracle "
-    "Cloud Platform lead this space."
+    "PaaS gives developers an internet-based environment for building "
+    "and deploying applications, abstracting away the infrastructure "
+    "underneath. In ERP ecosystems, PaaS is where organizations build "
+    "custom modules, integrations, and analytics tools that extend "
+    "their cloud ERP. SAP Business Technology Platform and Oracle "
+    "Cloud Platform are the leading options in this space."
 ),
 
 229: (
-    "SaaS is the dominant delivery vehicle for cloud ERP. Infrastructure, "
-    "platform, and application\u2014the entire stack\u2014lives with the vendor. "
-    "Customers access it through a browser or API, pay per user or per "
-    "module, and get patches, updates, and feature releases automatically. "
-    "The IT team\u2019s maintenance burden drops to nearly zero."
+    "SaaS is the most common delivery model for cloud ERP. The "
+    "vendor owns and operates the entire stack\u2014infrastructure, "
+    "platform, and application. Customers access it through a browser "
+    "or API, pay per user or per module, and receive updates "
+    "automatically. The IT team\u2019s maintenance workload drops to "
+    "almost nothing."
 ),
 
 231: (
-    "SaaS ERP is where enterprise functionality meets cloud-native delivery. "
-    "SAP S/4HANA Cloud (Public Edition), Oracle Fusion Cloud ERP, Microsoft "
-    "Dynamics 365 Finance, and Workday Finance lead the pack. Common traits: "
-    "standardized processes drawn from industry best practices, quarterly or "
-    "half-yearly feature drops, multi-tenant architecture that shares costs "
-    "across customers, and built-in hooks for AI, machine learning, and "
-    "advanced analytics."
+    "SaaS ERP combines enterprise resource planning functionality "
+    "with cloud-native delivery. The leading platforms\u2014SAP S/4HANA "
+    "Cloud (Public Edition), Oracle Fusion Cloud ERP, Microsoft "
+    "Dynamics 365 Finance, and Workday Finance\u2014share common traits: "
+    "standardized processes built on industry best practices, "
+    "quarterly or semi-annual feature updates, multi-tenant "
+    "architecture that spreads costs across customers, and native "
+    "hooks for AI, machine learning, and advanced analytics."
 ),
 
 236: (
-    "ERP has moved through clearly distinct generational phases, each one "
-    "pushing capability, delivery method, and strategic importance to a new "
-    "level. The timeline below maps those milestones to the features\u2014and "
-    "the constraints\u2014that defined each era."
+    "ERP systems have evolved through distinct generational phases. "
+    "Each phase brought a step change in capability, delivery model, "
+    "and strategic relevance within organizations. The timeline below "
+    "traces those milestones and the features\u2014and limitations\u2014that "
+    "characterized each era."
 ),
 
 239: (
-    "Functionally, on-premises and cloud ERP cover much the same ground\u2014"
-    "finance, HR, supply chain, and so on. Architecturally, however, they "
-    "are worlds apart. On-premises ERP is monolithic: single-tenant, "
-    "vertically integrated server stacks. Cloud ERP, particularly in SaaS "
-    "form, is distributed: multi-tenant, microservices-based, hosted on "
-    "hyperscale infrastructure."
+    "On a functional level, on-premises and cloud ERP cover broadly "
+    "the same ground: finance, HR, supply chain management, and so on. "
+    "Architecturally, though, they are fundamentally different animals. "
+    "On-premises ERP is monolithic\u2014single-tenant, vertically "
+    "integrated server stacks. Cloud ERP, especially in SaaS form, "
+    "is distributed\u2014multi-tenant, microservices-based, and hosted "
+    "on hyperscale infrastructure."
 ),
 
 246: (
-    "Pull the threads together and a clear picture forms: cloud ERP adoption "
-    "is driven by a cocktail of technology, organizational culture, and "
-    "human behavior. Prior research consistently touts scalability, "
-    "flexibility, accessibility, and efficiency gains while simultaneously "
-    "waving red flags around user resistance, messy migrations, and data-"
-    "security worries."
+    "When the literature is considered as a whole, a clear pattern "
+    "emerges. Cloud ERP adoption is shaped by an interplay of "
+    "technology, organizational culture, and human behaviour. Studies "
+    "consistently point to benefits like scalability, flexibility, and "
+    "accessibility, while simultaneously raising concerns about user "
+    "resistance, complex migrations, and data security risks."
 ),
 
 247: (
-    "A gap stands out, though. Most studies either zoom in on technical "
-    "plumbing or examine large Western multinationals. Management-level "
+    "A noticeable gap exists, however. The majority of existing research "
+    "either drills into technical plumbing or studies large multinational "
+    "corporations headquartered in the West. Management-oriented "
     "perspectives from Indian professional service firms\u2014particularly "
-    "around employee readiness, adoption patterns, and the support "
-    "structures that smooth a migration\u2014have received remarkably little "
-    "scholarly attention."
+    "around how ready employees are, how they adopt new systems, and "
+    "what support structures ease the transition\u2014have received "
+    "surprisingly little academic attention."
 ),
 
 248: (
-    "This study picks up where the existing work leaves off. By "
-    "investigating cloud ERP migration at Keystone Advisory Group and "
-    "weaving together organizational strategy with user-perception data "
-    "inside a single research framework, it tightens the link between "
-    "academic theory and the messy realities managers face on the ground."
+    "This study steps into that gap. By examining cloud ERP migration "
+    "at Keystone Advisory Group and weaving together organizational "
+    "strategy with user-perception data inside a single research "
+    "framework, it creates a tighter connection between theoretical "
+    "concepts and the practical challenges managers face on the ground."
 ),
 
 249: (
-    "Another thread in the literature: organizations going cloud-first on "
-    "ERP increasingly prize agility, elastic scaling, and remote access\u2014"
-    "responses to fast-moving markets and the digital transformation "
-    "imperative. COVID-19 was a powerful accelerant; the pandemic exposed "
-    "just how brittle on-premises infrastructure is when offices empty out "
-    "and distributed operations become the norm."
+    "Another theme running through the literature is that companies "
+    "going cloud-first with ERP increasingly prioritize business "
+    "agility, elastic scaling, and remote access. The COVID-19 "
+    "pandemic was a powerful catalyst in this regard\u2014it exposed "
+    "just how brittle on-premises infrastructure becomes when "
+    "offices close and business operations must continue remotely."
 ),
 
 250: (
-    "Scholars also stress that judging a cloud ERP rollout purely on its "
-    "technology is a mistake. Organizational readiness, how well employees "
-    "adapt, and whether the migration fits long-term strategy matter just "
-    "as much. As a result, modern migration research increasingly blends "
-    "management and technical viewpoints to paint a fuller picture of what "
-    "cloud transformation really entails."
+    "Researchers also caution against judging a cloud ERP deployment "
+    "purely on its technology. Organizational readiness, employee "
+    "adaptation, and strategic alignment matter just as much. That "
+    "is why modern migration studies increasingly combine management "
+    "perspectives with technical analysis to produce a more complete "
+    "picture of what cloud transformation actually involves."
 ),
 
 252: (
-    "Combing methodically through the academic and practitioner literature "
-    "turns up several zones where hard evidence is either thin or absent "
-    "altogether. Those gaps define the exact niche this study occupies."
+    "A careful review of both academic and practitioner literature "
+    "reveals several areas where empirical evidence is either thin "
+    "or missing entirely. Those gaps define the specific contribution "
+    "this study sets out to make."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 3 — RESEARCH METHODOLOGY  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 3
+# ===========================================================
 
 CHAPTER3 = {
 
 275: (
-    "Methodology is the spine of any scholarly investigation. It pins down "
-    "how data gets collected and scrutinized, and it sets the bar for "
-    "credibility, reproducibility, and academic rigour. A transparent "
-    "methodology lets evaluators decide for themselves whether the "
-    "conclusions genuinely follow from the evidence or merely reflect "
-    "the researcher\u2019s hunches."
+    "Methodology is the backbone of any credible academic study. It "
+    "determines how data gets collected, how it\u2019s analysed, and whether "
+    "the conclusions actually hold up under scrutiny. Without a "
+    "transparent methodology, there\u2019s simply no way for readers or "
+    "evaluators to judge whether the findings follow from the evidence "
+    "or just reflect what the researcher wanted to believe."
 ),
 
 276: (
-    "What follows is the full methodological blueprint for this study of "
-    "attitudes and perceptions toward cloud ERP migration. It lays out the "
-    "research design, the character of the data, the instruments behind "
-    "data collection, the sampling game plan, the analytical techniques "
-    "applied, and the ethical guardrails observed throughout. Every "
-    "methodological choice is tied back to the study\u2019s objectives and "
-    "the nature of the problem at hand."
+    "This chapter presents the full methodological framework used to "
+    "study perceptions and attitudes toward cloud ERP migration. It "
+    "covers the research design philosophy, the nature of the data, "
+    "the collection instruments, the sampling approach, the analytical "
+    "techniques, and the ethical safeguards observed throughout. Every "
+    "decision is justified in terms of the study\u2019s objectives and "
+    "the character of the research problem."
 ),
 
 277: (
-    "Once responses were coded, analysis proceeded through descriptive "
-    "techniques anchored in percentages. Results were then read against "
-    "the research objectives to tease out recurring patterns, prevailing "
-    "attitudes, and shared perceptions around cloud ERP migration. Tables "
-    "and charts translate those results into a format that is both "
-    "structured and straightforward to follow."
+    "After coding, responses were analysed using descriptive methods "
+    "based on percentages. Those results were then interpreted "
+    "against the research objectives to pull out recurring patterns, "
+    "prevailing attitudes, and shared perceptions about cloud ERP "
+    "migration. Tables and charts were used to present the findings "
+    "in a structured, accessible format."
 ),
 
 279: (
-    "The study sits on a descriptive research foundation. Descriptive "
-    "research fits when the goal is to capture\u2014accurately and "
-    "measurably\u2014the characteristics, opinions, and attitudes a defined "
-    "group holds toward a given phenomenon. Here, that phenomenon is cloud "
-    "ERP migration. Unlike exploratory work (used when a topic is barely "
-    "charted) or causal research (used to prove X causes Y), descriptive "
-    "research maps the landscape of opinion and experience in a structured, "
-    "quantifiable way."
+    "This study uses a descriptive research design. Descriptive research "
+    "is appropriate when the goal is to accurately capture the "
+    "characteristics, perceptions, and attitudes of a defined group "
+    "toward a specific phenomenon\u2014here, cloud ERP migration. Unlike "
+    "exploratory research, which is useful when little is known about "
+    "a topic, or causal research, which attempts to prove cause-and-"
+    "effect links, descriptive research systematically maps the current "
+    "landscape of opinions and experiences."
 ),
 
 280: (
-    "Why descriptive? Because the study seeks to capture how respondents "
-    "view legacy-system weaknesses, what they expect from cloud "
-    "alternatives, how they feel about organizational change management, "
-    "and whether they are satisfied with past technology switches. All of "
-    "these are perceptual constructs, and structured surveys are the "
-    "natural instrument for measuring them."
+    "The descriptive approach was chosen because the study aims to "
+    "understand how respondents perceive legacy systems, what they "
+    "expect from cloud alternatives, how they feel about change "
+    "management processes, and whether they are satisfied with past "
+    "technology transitions. These are all perceptual and attitudinal "
+    "constructs, and structured surveys are the natural way to "
+    "measure them."
 ),
 
 281: (
-    "Readiness for cloud ERP migration can be appraised along several "
-    "dimensions: technical infrastructure, staff preparedness, data "
-    "quality, and leadership backing. Survey responses here capture "
-    "readiness indirectly\u2014through how familiar respondents are with "
-    "cloud tools and how open they are to trying new systems. The "
-    "descriptive approach was judged the best fit because the study aims "
-    "to map perceptions and tendencies, not to establish causal chains. "
-    "Given that cloud ERP adoption straddles both technology and human "
-    "behavior, structured opinion data shed genuine light on the real-world "
-    "challenges and expectations around system transition."
+    "Cloud ERP readiness can be assessed across several dimensions: "
+    "technical infrastructure, employee preparedness, data quality, "
+    "and management support. The survey in this study captures "
+    "readiness indirectly, through questions about familiarity with "
+    "cloud tools and openness to trying new systems. A descriptive "
+    "design was judged the best fit because the objective is to map "
+    "perceptions and tendencies rather than prove causal "
+    "relationships. Since cloud ERP adoption straddles both "
+    "technology and human behaviour, structured opinion data provide "
+    "genuine insight into the practical challenges of system "
+    "transition."
 ),
 
 284: (
-    "Two streams of data feed this study: primary and secondary, combined "
-    "to build as complete an evidence base as possible."
+    "The study draws on two streams of data\u2014primary and secondary\u2014"
+    "to build as thorough an evidence base as possible."
 ),
 
 288: (
-    "Primary data\u2014collected first-hand by the researcher expressly for "
-    "this project\u2014has not appeared in any earlier publication. A "
-    "structured questionnaire went out via Google Forms to a convenience "
-    "sample of 35 individuals: students and early-career professionals "
-    "drawn from a range of academic disciplines."
+    "Primary data is original data collected by the researcher "
+    "specifically for this project. None of it has been published or "
+    "analysed before. Collection was done through a structured "
+    "questionnaire distributed via Google Forms to a convenience "
+    "sample of 35 individuals\u2014a mix of students and early-career "
+    "professionals from different academic backgrounds."
 ),
 
 289: (
-    "This primary data sits at the empirical heart of the research. The "
-    "questionnaire was built to probe how respondents view traditional "
-    "versus cloud-based systems, how they feel about switching "
-    "technologies, and whether they came away satisfied from past "
-    "transitions. Language was kept simple and jargon-free so that "
-    "participants without IT specializations could still give meaningful "
-    "answers."
+    "This primary data sits at the empirical core of the research. "
+    "The questionnaire was designed to probe how respondents compare "
+    "traditional and cloud-based systems, how they feel about "
+    "switching technologies, and whether past transitions left them "
+    "satisfied. Jargon was deliberately avoided so that respondents "
+    "without IT expertise could still give meaningful answers."
 ),
 
 290: (
-    "Going digital with the survey\u2014Google Forms, specifically\u2014sped "
-    "up collection, widened the reach, and made responding more "
-    "convenient. Automatic logging and built-in data export smoothed "
-    "the path from raw responses to organized datasets."
+    "Using an online questionnaire\u2014Google Forms, specifically\u2014sped "
+    "up data collection, broadened the reach, and made it easier "
+    "for people to respond at their convenience. Built-in features "
+    "like automatic response logging and data export simplified "
+    "the move from raw answers to organized datasets."
 ),
 
 292: (
-    "Secondary data\u2014information already published by other researchers "
-    "or institutions\u2014served three roles: building the theoretical frame "
-    "in Chapter 2, justifying the chosen research design, and providing "
-    "context for interpreting the primary results. Sources spanned "
-    "peer-reviewed journals, methodology textbooks, Gartner and IDC "
-    "industry reports, and vendor documentation from SAP and Microsoft."
+    "Secondary data is information that was already collected and "
+    "published by other researchers or institutions. In this study, "
+    "secondary sources served three purposes: they built the "
+    "theoretical framework in Chapter 2, justified the research "
+    "design, and provided context for interpreting the primary "
+    "findings. The sources included peer-reviewed journals, "
+    "methodology textbooks, Gartner and IDC industry reports, and "
+    "vendor documentation from SAP and Microsoft."
 ),
 
 294: (
-    "No researcher can survey an entire population, so sampling steps in. "
-    "By selecting a manageable subset, the study can still draw meaningful "
-    "conclusions without the logistical impossibility of reaching everyone."
+    "Surveying an entire population is rarely feasible. Sampling "
+    "solves that problem by selecting a manageable subset from which "
+    "meaningful conclusions can still be drawn."
 ),
 
 296: (
-    "The target population includes students and working professionals "
-    "who have used any kind of digital or office-management tool\u2014"
-    "anything from SAP or Tally to Google Drive, Zoom, or an online "
-    "banking app. Casting the net this wide was intentional. The "
-    "questionnaire probes general attitudes toward technology adoption, "
-    "not specialist ERP knowledge, so a diverse respondent base "
-    "strengthens rather than weakens the data."
+    "The target population for this study consists of students and "
+    "working professionals who have experience using some form of "
+    "digital or office management tool\u2014whether that is SAP, Tally, "
+    "Google Drive, Zoom, or an online banking app. The net was cast "
+    "wide on purpose. The questionnaire probes general attitudes "
+    "toward technology adoption, not specialist ERP expertise, so "
+    "a diverse respondent base actually strengthens rather than "
+    "weakens the quality of the data."
 ),
 
 298: (
-    "Convenience sampling drove respondent selection. Participants were "
-    "picked on the basis of availability and willingness, not through "
-    "random draw. This is standard practice in student-led academic "
-    "projects where time, budget, and access rule out probability-"
-    "based sampling."
+    "Respondent selection followed a convenience sampling approach. "
+    "Participants were chosen based on accessibility and willingness "
+    "to take part, not through random selection. This is standard "
+    "practice for student-led research projects where time, budget, "
+    "and access constraints make probability-based sampling "
+    "impractical."
 ),
 
 299: (
-    "Distribution happened digitally\u2014Google Forms links shared via "
-    "WhatsApp, email, and direct messages to classmates, peers, and "
-    "acquaintances. The trade-off is familiar: convenience sampling "
-    "limits generalisability, but for a descriptive study aiming to "
-    "spot attitudinal patterns rather than make population-level "
-    "claims, it is a defensible choice."
+    "The questionnaire was shared digitally\u2014Google Forms links "
+    "sent through WhatsApp, email, and direct messages to classmates, "
+    "peers, and acquaintances. The trade-off is well understood: "
+    "convenience sampling limits generalisability. But for a "
+    "descriptive study whose aim is to identify attitudinal patterns "
+    "rather than make claims about an entire population, it is a "
+    "defensible choice."
 ),
 
 302: (
-    "Thirty-five respondents were the target. Bigger samples are always "
-    "nicer, but academic convention accepts 30-plus as a workable "
-    "threshold for basic analysis. For a percentage-based descriptive "
-    "study, 35 is enough to surface meaningful trends\u2014and realistic "
-    "given the time and access constraints a student researcher faces."
+    "The target sample size was 35 respondents. Larger samples are "
+    "always preferable, but in academic research a sample of 30 or "
+    "more is widely accepted as sufficient for basic analysis. "
+    "For a descriptive, percentage-based study, 35 is enough to "
+    "surface meaningful trends\u2014and realistic given the time and "
+    "access constraints of a student project."
 ),
 
 308: (
-    "Questions were aligned with the research objectives; wording was "
-    "kept plain to cut down on respondent confusion. Before the form "
-    "went live, it was reviewed end-to-end for logical flow and "
-    "consistency."
+    "The questionnaire was designed to align with the research "
+    "objectives. Plain language was used throughout to minimize the "
+    "risk of respondent confusion. Before distribution, the full "
+    "form was reviewed for logical flow and internal consistency."
 ),
 
 309: (
     "Because the analysis stays within descriptive, percentage-based "
-    "territory, heavy-duty statistical validation was not applied. "
-    "That said, the data hold up for descriptive purposes within the "
-    "study\u2019s defined scope."
+    "territory, advanced statistical validation techniques were not "
+    "applied. That said, the collected data is considered reliable "
+    "for descriptive purposes within the scope of this study."
 ),
 
 314: (
-    "Nobody was forced to participate. Every respondent knew the data "
-    "was for academic use and that their individual answers would stay "
-    "anonymous in the final report. Responses were stored securely, "
-    "used solely for research, and handled in line with Chandigarh "
-    "University\u2019s data-protection policies."
+    "Participation was entirely voluntary and anonymous. Respondents "
+    "were informed that the data was being collected for academic "
+    "purposes only and that no individual responses would be "
+    "identifiable in the final report. All data was stored securely "
+    "and used exclusively for research, in accordance with "
+    "Chandigarh University\u2019s data protection policies."
 ),
 
 315: (
-    "No question was compulsory, and respondents could walk away from "
-    "the survey at any point. That combination\u2014voluntary, anonymous, "
-    "discontinuable\u2014ensured ethical transparency from start to finish."
+    "No question was compulsory, and respondents could discontinue "
+    "the survey at any point. This combination of voluntary "
+    "participation, anonymity, and the right to withdraw ensured "
+    "ethical transparency throughout."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 4 — DATA ANALYSIS AND INTERPRETATION  (aggressive)
-# ============================================================
+# ===========================================================
+# CHAPTER 4
+# ===========================================================
 
 CHAPTER4 = {
 
 318: (
-    "Here, the primary and organizational data gathered from 35 respondents "
-    "through the Chapter 3 Google Forms questionnaire are broken down question "
-    "by question. Each question appears as a frequency table, followed by "
-    "space for a bar chart and a brief read of what the numbers say."
+    "This chapter breaks down the primary and organizational data "
+    "collected from 35 respondents via the Google Forms questionnaire "
+    "described in Chapter 3. Each question is shown as a frequency "
+    "table, followed by space for a bar chart and a brief "
+    "interpretation of the results."
 ),
 
 320: (
-    "What follows is a question-by-question walkthrough of the primary survey "
-    "data. Thirty-five respondents shared their experiences, opinions, "
-    "pain points, and preferences around cloud-based systems\u2014yielding "
-    "a practical snapshot of how cloud technologies land with real users."
+    "What follows is a question-by-question analysis of the primary "
+    "survey data. Thirty-five respondents shared their experiences, "
+    "opinions, difficulties, and preferences regarding cloud-based "
+    "systems, providing a practical snapshot of how cloud technologies "
+    "are perceived by real users."
 ),
 
 339: (
-    "Two related prompts appear here: respondents selected the advantages "
-    "they associate with cloud systems (multi-select) and then stated "
-    "whether they consider cloud or traditional systems better overall "
-    "(single choice). Results sit side by side for easy comparison."
+    "Two related questions are presented together here. First, "
+    "respondents selected the advantages they associate with cloud "
+    "systems (multi-select). Then they indicated whether they consider "
+    "cloud or traditional systems better overall (single choice)."
 ),
 
 345: (
-    "Convenience, remote access, and lighter maintenance loads emerged as "
-    "the heaviest influences on pro-cloud sentiment. The pattern mirrors "
-    "a wider shift: users increasingly expect flexible, location-agnostic "
-    "systems as the default, not the exception."
+    "Convenience, the ability to work from anywhere, and lighter "
+    "maintenance requirements stood out as the strongest influences "
+    "on positive attitudes toward cloud ERP. This fits a broader "
+    "trend: users increasingly expect flexible, location-independent "
+    "systems as the default rather than the exception."
 ),
 
 347: (
-    "Three linked questions round out the switching picture: what blocks "
-    "people from switching, what would make switching easier, and how long "
-    "adaptation actually takes. Answers follow one after another."
+    "Three linked questions address the switching experience: what "
+    "stops people from switching, what would make it easier, and "
+    "how long full adaptation takes. The results follow in sequence."
 ),
 
 353: (
-    "A clear thread runs through the responses: whether an ERP transition "
-    "succeeds or stumbles depends heavily on how ready the people are and "
-    "how much support the organization throws behind them. Structured "
-    "change management is not optional\u2014it is foundational."
+    "A clear pattern runs through these responses: whether an ERP "
+    "transition succeeds depends heavily on how prepared the people "
+    "are and how much support the organization provides. Structured "
+    "change management is not optional; it is foundational."
 ),
 
 355: (
-    "The survey\u2019s closing pair of questions capture what respondents "
-    "experienced after switching systems and whether they would recommend "
-    "the move. Both are shown together below."
+    "The last two survey questions look at what respondents experienced "
+    "after switching systems and whether they would recommend it. "
+    "Both sets of results appear together below."
 ),
 
 360: (
-    "Enthusiasm for cloud upgrades came through loud and clear\u2014a strong "
-    "signal of digital-transformation acceptance. At the same time, the "
-    "tilt toward gradual rollouts hints that phased migration strategies "
-    "may cut resistance and set the stage for stickier, longer-term "
-    "adoption."
+    "The strong enthusiasm for cloud upgrades signals genuine "
+    "acceptance of digital transformation among respondents. "
+    "At the same time, the preference for gradual implementation "
+    "suggests that phased migration strategies could reduce "
+    "resistance and improve long-term adoption success."
 ),
 
 362: (
-    "Zooming out, the survey paints a decisively positive picture of "
-    "cloud-based systems. Traditional platforms drew complaints about slow "
-    "performance, poor remote access, and excessive dependence on tech "
-    "support. Cloud systems, by contrast, were seen as more flexible, "
-    "reachable from anywhere, and better suited to how organizations "
-    "work today."
+    "Stepping back from the individual questions, the survey data "
+    "tell a pretty clear story. Traditional systems drew complaints "
+    "about slow performance, limited remote access, and too much "
+    "dependence on technical support. Cloud systems, by contrast, "
+    "were consistently seen as more flexible, more accessible, and "
+    "frankly better suited to how organizations operate today. "
+    "That\u2019s not a subtle difference\u2014it\u2019s a decisive shift in "
+    "user sentiment."
 ),
 
 363: (
-    "Human factors turned out to be just as pivotal as technology. "
-    "Training, honest communication, and organizational backing were "
-    "tagged as make-or-break enablers of a smooth ERP switch. "
-    "Respondents leaned strongly toward phased rollouts, suggesting "
-    "that gradual migration paths lower anxiety and ease the learning "
-    "curve."
+    "Human factors proved just as important as technology. Training, "
+    "transparent communication, and organizational support were "
+    "identified as critical enablers. Respondents showed a clear "
+    "preference for phased rollouts, indicating that gradual "
+    "migration paths reduce anxiety and smooth the learning curve."
 ),
 
 364: (
-    "Taken together, the data reinforce a straightforward thesis: "
-    "cloud ERP lifts efficiency, broadens access, and gives "
-    "organizations more room to manoeuvre\u2014provided the change-"
-    "management machinery is in place to support the humans at "
-    "the other end of the screen."
+    "Taken as a whole, the data support a straightforward argument: "
+    "cloud ERP improves efficiency, widens access, and gives "
+    "organizations more room to manoeuvre\u2014but only when solid "
+    "change-management practices are in place to support the "
+    "people using the system."
 ),
 
 365: (
-    "One more pattern worth flagging: nearly every respondent already "
-    "uses cloud applications day to day, whether in a classroom or "
-    "a corporate setting. That baseline fluency is a hidden asset for "
-    "any organization rolling out cloud ERP\u2014the learning curve starts "
-    "from a higher base. Respondents also saw cloud tools as a better "
-    "match for modern work habits\u2014remote access, real-time "
-    "collaboration, and on-the-go flexibility."
+    "One additional observation worth noting: nearly every respondent "
+    "already uses cloud applications in their daily routine, whether "
+    "in an academic or professional setting. That baseline familiarity "
+    "is an asset for any organization rolling out cloud ERP because "
+    "it means the learning curve starts from a higher baseline. "
+    "Respondents also saw cloud tools as better aligned with modern "
+    "work habits\u2014remote access, real-time collaboration, and "
+    "working on the move."
 ),
 
 366: (
-    "Still, technology alone does not seal the deal. Communication, "
-    "training, self-confidence, and institutional support keep surfacing "
-    "as decisive factors in whether users accept and stick with a new "
-    "system. The implication for practitioners: pair every technical "
-    "blueprint with an equally rigorous change-management strategy."
+    "Still, technology alone will not guarantee success. Communication, "
+    "training, user confidence, and institutional backing keep "
+    "surfacing as decisive factors in whether people accept a new "
+    "system and stick with it over time. The implication for "
+    "practitioners is clear: every technical blueprint needs an "
+    "equally rigorous change-management plan alongside it."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 5 — FINDINGS AND RESULTS  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 5
+# ===========================================================
 
 CHAPTER5 = {
 
 385: (
-    "This chapter distils the key takeaways from the Chapter 4 analysis. "
-    "Everything traces back to the structured questionnaire responses and "
-    "maps onto the research objectives laid out in Chapter 1. The "
-    "analytical lens is descriptive and percentage-based; no fresh data "
-    "enters the picture here."
+    "This chapter pulls together the key findings from the data "
+    "analysis in Chapter 4. Everything traces back to the structured "
+    "questionnaire and maps onto the research objectives from "
+    "Chapter 1. The analytical approach is descriptive and "
+    "percentage-based; no new data appears here."
 ),
 
 387: (
-    "The respondent pool split evenly: two in five were working "
-    "professionals, two in five straddled both student and working "
-    "roles, and the remaining one in five were full-time students\u2014a "
-    "balanced mix that lends credibility to the results."
+    "The respondent pool was balanced: two in five were working "
+    "professionals, another two in five straddled student and "
+    "working roles, and the remaining one in five were full-time "
+    "students. That spread lends credibility to the results."
 ),
 
 388: (
-    "Most respondents felt comfortable with cloud-based tools, "
-    "confirming they were well positioned to compare cloud and "
-    "traditional systems from first-hand experience."
+    "Most respondents reported being comfortable with cloud-based "
+    "tools, which means they were well placed to compare cloud "
+    "and traditional systems from genuine experience."
 ),
 
 390: (
-    "Four out of five respondents (80%) cited sluggish performance or "
-    "outright crashes as the most common headache with traditional "
-    "systems."
+    "Four out of five respondents (80 percent) identified slow "
+    "performance or system crashes as the most widespread "
+    "limitation of traditional systems."
 ),
 
 391: (
-    "Remote-access limitations, dependence on IT helpdesks, and slow "
-    "report turnaround were each flagged by two in five respondents "
-    "(40%), underscoring a cluster of operational pain points."
+    "Inability to access systems remotely, dependence on IT support "
+    "for minor issues, and slow report generation were each cited "
+    "by two in five respondents (40 percent), pointing to a "
+    "cluster of operational frustrations."
 ),
 
 392: (
-    "Two in five (40%) singled out high maintenance costs as the "
-    "single biggest thorn in the side of traditional systems."
+    "High maintenance cost was singled out as the biggest single "
+    "problem by two in five respondents (40 percent)."
 ),
 
 393: (
-    "Hefty upkeep bills and the constant need for dedicated IT "
-    "staff further exposed the operational drag that legacy "
-    "platforms impose."
+    "Steep maintenance bills and the ongoing need for dedicated "
+    "IT staff further underlined the operational drag that "
+    "traditional systems impose."
 ),
 
 394: (
-    "Bottom line: traditional systems struggle with performance, "
-    "access, and cost\u2014three pillars that cloud ERP is designed "
-    "to shore up."
+    "The picture is consistent: traditional systems struggle "
+    "with performance, access, and cost\u2014three areas where "
+    "cloud ERP is designed to deliver improvement."
 ),
 
 396: (
-    "Every single respondent\u2014100%\u2014reported active use of "
-    "cloud-based tools, pointing to deep-rooted familiarity with "
-    "cloud platforms across the board."
+    "Every single respondent (100 percent) reported using "
+    "cloud-based tools, indicating deep-rooted familiarity "
+    "with cloud platforms."
 ),
 
 397: (
-    "The ability to log in from any location was unanimously rated "
-    "the top benefit (100%)."
+    "The ability to access systems from any location was "
+    "unanimously rated the most important advantage."
 ),
 
 398: (
-    "Usability, self-updating software, and reduced upkeep demands "
-    "were each flagged by four in five respondents (80%) as "
-    "standout perks."
+    "Usability, automatic software updates, and lower "
+    "maintenance requirements were each flagged as key "
+    "benefits by four out of five respondents (80 percent)."
 ),
 
 399: (
-    "Three in five respondents (60%) called cloud systems flat-out "
-    "better than traditional ones. The rest saw them as somewhat "
-    "better or on par\u2014no one rated them worse."
+    "Three in five (60 percent) called cloud systems outright "
+    "better than traditional ones. The rest considered them "
+    "somewhat better or comparable. Nobody rated them worse."
 ),
 
 400: (
-    "Not a single respondent sided with traditional systems over "
-    "cloud\u2014zero."
+    "Not a single respondent preferred traditional systems "
+    "over cloud-based alternatives."
 ),
 
 402: (
-    "Figuring out how to use the new system topped the list of "
-    "transition challenges, cited by four in five (80%)."
+    "Learning how to use the new system was the top transition "
+    "challenge, cited by four in five respondents (80 percent)."
 ),
 
 403: (
-    "Worry about losing data and gaps in training each troubled "
-    "three in five respondents (60%)."
+    "Concerns about data loss and inadequate training were "
+    "each reported as significant worries by three in five "
+    "respondents (60 percent)."
 ),
 
 404: (
-    "Hands-on training before go-live was tagged as the most "
-    "critical success lever\u2014unanimously, by all 35 respondents."
+    "Proper training before the transition was identified as "
+    "the most critical success factor\u2014unanimously, by all "
+    "35 respondents."
 ),
 
 405: (
-    "Transparent communication and active support throughout the "
-    "migration process were flagged by four in five (80%) as "
-    "essential."
+    "Clear communication and active support throughout the "
+    "migration were also cited as important enablers by "
+    "four in five respondents (80 percent)."
 ),
 
 406: (
-    "Two in five respondents (40%) pegged full adaptation at "
-    "one to three months\u2014the largest single cluster."
+    "The largest single group (40 percent) estimated that "
+    "full adaptation to a new system takes between one and "
+    "three months."
 ),
 
 408: (
-    "The majority reported clear, tangible gains after moving "
-    "to a more capable system."
+    "Most respondents reported experiencing tangible benefits "
+    "after switching to a more capable system."
 ),
 
 409: (
-    "Quicker response times, easier remote access, and fewer "
-    "crashes were each noted by four in five (80%)."
+    "Faster response times, easier remote access, and fewer "
+    "system errors were each noted by four in five respondents "
+    "(80 percent)."
 ),
 
 410: (
-    "Three in five (60%) gave a strong thumbs-up to cloud "
-    "migration; the rest preferred a stepped, gradual approach."
+    "Three in five (60 percent) strongly recommended upgrading "
+    "to cloud systems. The remainder preferred a more gradual "
+    "transition approach."
 ),
 
 411: (
-    "Opposition to cloud adoption? None whatsoever\u2014acceptance "
-    "was universal."
+    "No respondent opposed cloud adoption\u2014acceptance was "
+    "across the board."
 ),
 
 414: (
-    "These results paint a crisp picture of how respondents view "
-    "legacy and cloud systems alike. The insights form the raw "
-    "material for the conclusions drawn in the next chapter and "
-    "for a structured evaluation of each research objective."
+    "These findings offer a clear picture of how respondents "
+    "view both legacy and cloud systems. The insights serve as "
+    "the foundation for drawing conclusions in the next chapter "
+    "and for systematically evaluating each research objective."
 ),
 
 415: (
-    "A recurring theme: respondents link cloud platforms with "
-    "greater flexibility, easier access, and smoother daily "
-    "operations. Equally clear is the message that a successful "
-    "switch demands proper user prep, organizational backing, "
-    "and steady communication throughout."
+    "A recurring thread: respondents associate cloud platforms "
+    "with greater flexibility, easier access, and smoother "
+    "daily operations. Equally evident is the message that "
+    "successful transition requires proper user preparation, "
+    "organizational backing, and consistent communication."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 6 — CONCLUSIONS  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 6
+# ===========================================================
 
 CHAPTER6 = {
 
 418: (
-    "Conclusions are where findings meet meaning. Chapter 5 said what "
-    "the data show; this chapter explains what those numbers imply\u2014"
-    "for Keystone Advisory Group, for the research field, and for the "
-    "broader question of whether cloud ERP migration makes strategic sense."
+    "Findings tell you what the data show. Conclusions tell you "
+    "what those data actually mean\u2014for the organization, for the "
+    "research field, and for the broader question of whether cloud "
+    "ERP migration makes strategic sense. There\u2019s an important "
+    "distinction between the two, and this chapter connects the "
+    "Chapter 5 findings to the research objectives and theoretical "
+    "frameworks established at the start of the study."
 ),
 
 420: (
-    "Legacy-system pain is real and measurable. Two in five respondents "
-    "pegged remote-access barriers as the biggest headache; four in five "
-    "reported performance problems. Those numbers map directly onto "
-    "diminished efficiency\u2014and validate the push for cloud-based "
-    "alternatives."
+    "The data confirm that legacy systems carry real operational "
+    "baggage. Two in five respondents identified remote access "
+    "barriers as the biggest problem; four in five reported "
+    "performance-related issues. Those numbers directly translate "
+    "into reduced efficiency\u2014and they validate the argument for "
+    "cloud-based alternatives."
 ),
 
 421: (
-    "These are not minor annoyances. In a world built around hybrid work, "
-    "on-site consulting, and split-second decisions, a system that chains "
-    "users to a LAN is a competitive liability. Every pain point raised "
-    "in Chapter 1 for Keystone\u2014remote-access gaps, bloated maintenance "
-    "bills, scaling bottlenecks\u2014finds backing in the primary data."
+    "These are not trivial inconveniences. In a working world "
+    "built around hybrid arrangements, on-site client work, and "
+    "real-time decisions, a system that ties users to a LAN is a "
+    "genuine competitive liability. Every pain point raised in "
+    "Chapter 1 for Keystone\u2014poor remote access, ballooning "
+    "maintenance costs, slow scaling\u2014finds clear support in the "
+    "primary data."
 ),
 
 423: (
-    "Cloud-based systems enjoy broad and enthusiastic approval. All 35 "
-    "respondents use cloud tools; every one of them named anywhere-access "
-    "as the top benefit. Three in five went further, calling cloud systems "
-    "outright superior. That is a strong mandate."
+    "Cloud systems enjoy broad, enthusiastic support. All 35 "
+    "respondents use cloud tools already; every one of them named "
+    "anywhere-access as the top benefit. Three in five went "
+    "further and called cloud systems outright superior to "
+    "traditional ones. That is a strong endorsement."
 ),
 
 424: (
-    "Accessibility is the engine behind this preference. Being able to "
-    "fire up the system on any device, from any location, at any hour\u2014"
-    "that is what users value most. It maps perfectly onto the TAM concept "
-    "of Perceived Usefulness (Chapter 2): cloud ERP earns high marks "
-    "because it rips out the single most frustrating constraint of the "
-    "old system\u2014having to be physically present to get anything done."
+    "What drives this preference? Accessibility. Being able to "
+    "log in from any device, anywhere, at any hour\u2014that is "
+    "what users value most. It maps directly onto the TAM "
+    "concept of Perceived Usefulness discussed in Chapter 2. "
+    "Cloud ERP earns high marks because it eliminates the most "
+    "frustrating limitation of legacy systems: having to be "
+    "physically present to get anything done."
 ),
 
 426: (
-    "Migration hurdles are overwhelmingly human, not technical. Learning "
-    "new workflows (80%) and data-loss anxiety (60%) led the chart. "
-    "The message: user-centric planning is not a nice-to-have\u2014it is "
-    "the difference between a migration that sticks and one that stalls."
+    "When it comes to migration challenges, the data point "
+    "overwhelmingly toward human factors rather than technical "
+    "ones. Learning new workflows (80 percent) and worry about "
+    "data loss (60 percent) topped the chart. The takeaway is "
+    "clear: user-focused planning is not a nice-to-have\u2014it is "
+    "what separates a migration that succeeds from one that "
+    "stalls."
 ),
 
 427: (
-    "Organizations can tackle both barriers head-on. Training was the "
-    "number-one enabler (80%); clear communication came a close second "
-    "(60%). The lesson writes itself: invest in people and processes, "
-    "not just servers, and the odds of a successful cloud ERP migration "
-    "climb sharply."
+    "Both barriers are addressable. Training was the top enabler "
+    "(cited by 80 percent); clear communication was second (60 "
+    "percent). The lesson practically writes itself: invest in "
+    "people and processes, not just infrastructure, and the odds "
+    "of a smooth migration improve substantially."
 ),
 
 429: (
-    "Post-switch, the numbers tell a positive story. Four in five "
-    "respondents reported snappier performance and better access. Three "
-    "in five offered an outright endorsement of cloud systems\u2014evidence "
-    "that the promise holds up after go-live, not just on the brochure."
+    "After the switch, the picture is positive. Four in five "
+    "respondents reported faster performance and better access. "
+    "Three in five gave an outright endorsement of cloud systems\u2014"
+    "evidence that the benefits hold up in practice, not just "
+    "in vendor brochures."
 ),
 
 430: (
-    "Worth noting: two in five respondents favored a gradual, phased "
-    "migration. Even enthusiastic adopters respect the complexity involved "
-    "and prefer a measured rollout over a single-day big bang. That "
-    "preference carries weight for any organization charting its own "
-    "migration path."
+    "An important nuance: two in five respondents preferred a "
+    "gradual, phased migration over a single cutover date. Even "
+    "users who are enthusiastic about the move acknowledge that "
+    "migration is complex and value a measured approach over a "
+    "big-bang switch. That preference deserves serious attention "
+    "from any organization charting its own migration path."
 ),
 
 434: (
-    "Put it all together and the verdict is clear: cloud ERP migration "
-    "is strategically sound, broadly welcomed, and operationally "
-    "beneficial for firms like Keystone Advisory Group. Evidence from "
-    "35 respondents, layered onto the theoretical models from Chapter 2, "
-    "confirms that on-premises systems are falling behind modern "
-    "requirements while cloud platforms deliver better access, sharper "
-    "efficiency, and higher user satisfaction."
+    "Pulling everything together, the conclusion isn\u2019t ambiguous: "
+    "cloud ERP migration is strategically sound, broadly welcomed, "
+    "and operationally beneficial for organizations like Keystone "
+    "Advisory Group. Data from 35 respondents, layered onto the "
+    "theoretical frameworks from Chapter 2, tells us that "
+    "on-premises systems simply can\u2019t keep up with modern "
+    "requirements anymore. Cloud platforms deliver better access, "
+    "higher efficiency, and greater user satisfaction\u2014and the "
+    "respondents aren\u2019t shy about saying so."
 ),
 
 435: (
-    "For Keystone specifically, the data underline how important it is "
-    "to move past the legacy system\u2019s constraints around performance, "
-    "access, and operational overhead. Firms that pair structured training, "
-    "honest communication, and phased timelines with their migration "
-    "plan stand the best chance of reaping substantial operational "
-    "rewards."
+    "For Keystone specifically, the data underscore the importance "
+    "of moving past the limitations of the current system\u2014"
+    "performance bottlenecks, access restrictions, and "
+    "operational overhead. Organizations that combine structured "
+    "training, transparent communication, and phased migration "
+    "timelines stand the best chance of extracting real value "
+    "from cloud ERP."
 ),
 
 436: (
-    "Beyond the organizational takeaway, this study feeds into the "
-    "growing conversation about cloud ERP in India\u2019s professional "
-    "services sector\u2014offering ground-level insights on user perception, "
-    "migration friction, and the levers that drive success."
+    "Beyond the organizational implications, this study adds "
+    "to the growing body of research on cloud ERP adoption "
+    "within India\u2019s professional services sector, providing "
+    "ground-level data on user perception, migration friction, "
+    "and success factors."
 ),
 
 437: (
-    "The overarching conclusion: cloud ERP is more than a tech refresh. "
-    "It is a strategic pivot that bolsters organizational agility and "
-    "strengthens long-run competitive footing."
+    "The overarching conclusion is this: cloud ERP adoption "
+    "is not simply a technology upgrade. It is a strategic "
+    "transformation that strengthens organizational agility "
+    "and long-term competitive positioning."
 ),
 
 439: (
-    "Pulling together the study\u2019s findings\u2014both primary and secondary\u2014"
-    "a structured Cloud ERP Migration Framework is laid out for Keystone "
-    "Advisory Group. It offers a step-by-step, practical blueprint for "
-    "moving from on-premises ERP to a cloud platform while protecting "
-    "data integrity, keeping operations running, and bringing users along."
+    "Based on the study\u2019s findings from both primary and "
+    "secondary data, a structured Cloud ERP Migration Framework "
+    "is proposed for Keystone Advisory Group. It provides a "
+    "step-by-step, practical blueprint for transitioning from "
+    "on-premises ERP to a cloud platform while preserving data "
+    "integrity, maintaining operations, and bringing users along."
 ),
 
 443: (
     "Phase 1: Readiness Assessment\n"
-    "First, take stock. How sound is the technical infrastructure? Is the "
-    "data clean? Are employees open to change? Does the budget support the "
-    "move? Does the migration align with business goals? Survey results "
-    "from this study show that familiarity with cloud tools and willingness "
-    "to adapt are among the strongest readiness signals."
+    "Before anything else, the organization needs to take stock. "
+    "How sound is the technical infrastructure? Is the data clean "
+    "enough to migrate? Are employees open to change? Does the "
+    "budget support it? Does the migration align with business "
+    "goals? This study\u2019s findings show that familiarity with "
+    "cloud tools and willingness to adapt are among the strongest "
+    "signals of organizational readiness."
 ),
 
 445: (
     "Phase 2: Planning and Cloud Platform Selection\n"
-    "Lock down scope, objectives, and a realistic timeline. Then evaluate "
-    "cloud ERP vendors against cost, scalability, security, integration "
-    "breadth, and after-sales support. A rigorous vendor assessment "
-    "ensures the chosen platform serves both today\u2019s operational needs "
-    "and tomorrow\u2019s strategic ambitions."
+    "This phase locks down scope, objectives, and a realistic "
+    "timeline. Cloud ERP vendors should be evaluated against "
+    "cost, scalability, security, integration capabilities, and "
+    "vendor support quality. A thorough evaluation ensures the "
+    "chosen platform fits both current operational needs and "
+    "longer-term strategic ambitions."
 ),
 
 446: (
     "Phase 3: Data Migration and Integration\n"
-    "Here the rubber meets the road: organizational data, records, and "
-    "workflows move from the old system to the new cloud platform. This "
-    "phase is among the most risk-laden in any ERP project\u2014errors or "
-    "gaps during transfer can ripple through operations and distort "
-    "decision-making downstream."
+    "This is where organizational data, records, and workflows "
+    "move from the legacy system to the new cloud platform. It "
+    "is one of the riskiest stages of any ERP project because "
+    "errors or gaps during transfer can ripple through "
+    "operations and distort decision-making downstream."
 ),
 
 447: (
-    "Before a single record moves, the data needs a deep clean: weed "
-    "out duplicates, purge stale entries, and fill in gaps. Backups "
-    "should be ironclad to guard against permanent loss. Critical "
-    "modules and datasets deserve migration priority to keep the "
-    "business humming throughout the cutover."
+    "Before any data moves, a deep cleaning exercise is essential: "
+    "duplicates need to be removed, stale entries purged, and gaps "
+    "filled in. Robust backup mechanisms should be in place to "
+    "guard against permanent data loss. Critical modules and "
+    "datasets should be prioritized so that the business keeps "
+    "running smoothly throughout the cutover period."
 ),
 
 448: (
-    "Integration testing follows: confirm that the migrated ERP "
-    "plays nicely with existing tools and workflows. Any glitches "
-    "surfaced during testing should be ironed out before the wider "
-    "rollout\u2014catching problems early keeps disruption to a minimum "
-    "and protects system reliability."
+    "Integration testing comes next. The migrated ERP needs to "
+    "work properly alongside existing tools and workflows. Any "
+    "glitches caught during testing should be resolved before the "
+    "broader rollout\u2014catching problems early is far cheaper than "
+    "fixing them after they have disrupted live operations."
 ),
 
 449: (
-    "A phased migration under close watch is the safest play. "
-    "It tamps down operational risk, shores up data quality, and "
-    "smooths the ride into the new cloud ERP environment."
+    "A phased migration approach, closely monitored at each "
+    "stage, is the safest way forward. It controls operational "
+    "risk, protects data quality, and eases the transition into "
+    "the new cloud ERP environment."
 ),
 
 450: (
     "Phase 4: System Testing\n"
-    "Before going live, put the platform through rigorous functional, "
-    "performance, and security tests. Everything should meet "
-    "organizational benchmarks. Fix issues first; deploy second."
+    "Before going live, the platform should go through rigorous "
+    "functional, performance, and security testing. Everything "
+    "needs to meet organizational benchmarks. Issues should be "
+    "resolved before deployment, not after."
 ),
 
 451: (
     "Phase 5: User Training and Change Management\n"
-    "Technology is only as good as the people using it. Equip staff "
-    "with the skills to work the new system confidently, and "
-    "communicate openly to defuse resistance. This study\u2019s data "
-    "single out training as the top factor in post-migration "
-    "satisfaction and adoption."
+    "A system is only as effective as the people who use it. "
+    "Employees need to be trained on the new platform, and clear "
+    "communication should be used to manage resistance. This "
+    "study\u2019s data identify training as the single most important "
+    "factor in post-migration satisfaction and adoption."
 ),
 
 452: (
     "Phase 6: Go-Live and Post-Migration Support\n"
-    "Flip the switch\u2014and then keep watching. Continuous performance "
-    "monitoring, a feedback loop, and ongoing enhancements are what "
-    "turn a successful launch into sustained, long-term value."
+    "Deploy the system\u2014and then keep watching. Continuous "
+    "performance monitoring, a feedback loop, and ongoing "
+    "enhancements are what turn a successful launch into "
+    "sustained long-term value."
 ),
 
 453: (
-    "What ties these phases together is a management-first philosophy. "
-    "Each stage is calibrated to limit operational disruption while "
-    "boosting employee readiness, safeguarding data, and keeping the "
-    "system adaptable. Aligning every migration activity with broader "
-    "business goals ensures cloud ERP contributes to lasting efficiency "
-    "and strategic agility\u2014not just a shinier IT stack."
+    "What ties all six phases together is a management-first "
+    "philosophy. Each stage is designed to minimize operational "
+    "disruption while improving employee readiness, safeguarding "
+    "data, and keeping the system adaptable. Aligning every "
+    "migration activity with broader business goals ensures that "
+    "cloud ERP delivers lasting efficiency and strategic "
+    "flexibility\u2014not just a newer IT stack."
 ),
 
 454: (
-    "Follow this framework and the transition to cloud ERP becomes "
-    "lower-risk, higher-adoption, and financially rewarding. It also "
-    "directly answers the study\u2019s research questions by packaging "
-    "readiness assessment, vendor selection, and migration strategy "
-    "into one coherent playbook."
+    "Follow this framework and the transition becomes "
+    "lower-risk, higher-adoption, and more financially "
+    "rewarding. The framework also directly addresses this "
+    "study\u2019s research questions by packaging readiness "
+    "assessment, vendor selection, and migration strategy "
+    "into one coherent plan."
 ),
 
 455: (
-    "In short, the framework hands Keystone Advisory Group a clear "
-    "roadmap: implement cloud ERP successfully, then sustain the "
-    "efficiency and agility gains over the long haul."
+    "In short, the framework gives Keystone Advisory Group "
+    "a clear roadmap: implement cloud ERP successfully, then "
+    "sustain the efficiency and agility gains over the long "
+    "term."
 ),
 
 457: (
-    "For Keystone\u2019s leadership, several managerial takeaways stand out. "
-    "Cloud ERP migration is a strategic organizational shift, not merely "
-    "an IT exercise\u2014user adoption and change management deserve equal "
-    "billing. ERP implementation should tie to headline business goals: "
-    "cost control, operational efficiency, better data access. Consistent "
-    "communication, employee participation, and structured training are "
-    "the antidotes to resistance. And the phased rollout outlined in "
-    "the framework above offers a practical path to lower risk, smoother "
-    "transition, and long-term performance gains."
+    "Several managerial implications stand out for Keystone\u2019s "
+    "leadership. First, cloud ERP migration is a strategic "
+    "organizational shift, not just an IT project\u2014user adoption "
+    "and change management deserve equal emphasis. Second, ERP "
+    "implementation should connect to headline business goals: "
+    "cost control, operational efficiency, better data "
+    "accessibility. Third, ongoing communication, employee "
+    "participation, and structured training programmes are the "
+    "antidote to resistance. And fourth, the phased approach "
+    "outlined in the migration framework provides a practical "
+    "path to lower risk, smoother transition, and long-term "
+    "performance gains."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 7 — RECOMMENDATIONS  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 7
+# ===========================================================
 
 CHAPTER7 = {
 
 460: (
-    "What follows is a set of action-oriented recommendations drawn "
-    "directly from the data and conclusions of this study. Each one "
-    "targets Keystone Advisory Group and organizations in similar "
-    "shoes\u2014not generic advice, but specific guidance anchored in "
-    "evidence."
+    "The recommendations below are drawn directly from the data "
+    "and conclusions of this study. Each one targets Keystone "
+    "Advisory Group and organizations facing similar circumstances. "
+    "These are specific, evidence-backed suggestions\u2014not generic "
+    "advice."
 ),
 
 462: (
-    "Training topped the survey as the single most important enabler "
-    "of a smooth switch\u2014100% agreement, the highest mark in the entire "
-    "questionnaire. Paradoxically, figuring out the new system also "
-    "ranked as the number-one headache (80%). That tension\u2014between "
-    "what users desperately need and what organizations typically "
-    "skimp on\u2014represents one of migration\u2019s biggest landmines."
+    "Training was identified as the single most important enabler "
+    "of a smooth transition by every respondent\u2014100 percent "
+    "agreement, the highest figure in the entire survey. And yet, "
+    "learning how to use the new system was cited as the number one "
+    "challenge by 80 percent. Think about that for a moment. There\u2019s "
+    "a clear gap between what users desperately need and what "
+    "organizations typically bother to provide\u2014and it\u2019s one of "
+    "migration\u2019s most dangerous blind spots."
 ),
 
 463: (
-    "Recommendation: Build role-specific training modules and deliver "
-    "them four to six weeks before go-live. Keep sessions short and "
-    "task-oriented\u2014finance staff drill on billing and reporting, HR "
-    "works through payroll and leave flows, and so on. Appoint early "
-    "adopters within each team as peer champions; they accelerate "
-    "adoption organically and at zero extra cost."
+    "Recommendation: Design role-specific training modules and "
+    "deliver them four to six weeks before go-live. Keep sessions "
+    "short and task-focused. Finance staff should practise on "
+    "billing and reporting modules; HR should work through payroll "
+    "and leave flows. Identify early adopters within each team and "
+    "appoint them as peer champions who can support colleagues\u2014"
+    "it accelerates adoption without adding to the budget."
 ),
 
 465: (
-    "Four in five respondents said clear messaging about why the "
-    "migration matters would smooth the path. Yet in practice, ERP "
-    "migrations are too often framed as IT projects\u2014go-live dates "
-    "and server specs rather than a story people can relate to."
+    "Four in five respondents said that clear communication about "
+    "the purpose of the migration would make the transition easier. "
+    "In practice, though, ERP migrations are frequently presented "
+    "as IT projects\u2014full of go-live dates and server specifications "
+    "but short on the business rationale that actually matters to "
+    "end users."
 ),
 
 466: (
-    "Recommendation: Tell people what changes for them, in plain "
-    "language. \u201cTimesheets from any device\u201d beats \u201ccloud-native "
-    "workflow engine.\u201d \u201cReports in 10 minutes instead of 90\u201d "
-    "resonates far more than a slide deck about scalability. Link "
-    "the system change to daily wins and resistance drops "
-    "dramatically."
+    "Recommendation: Explain what changes for each role, using "
+    "plain language. Saying \u201cyou can now submit timesheets from "
+    "any device\u201d resonates far more than explaining a cloud-native "
+    "workflow engine. Telling someone \u201creports that used to take 90 "
+    "minutes will now take 10\u201d is more persuasive than a slide deck "
+    "about scalability. Link the system change to daily, personal "
+    "benefits and resistance drops sharply."
 ),
 
 468: (
-    "Two in five respondents leaned toward gradual migration, and "
-    "many pegged full adaptation at one to three months. A big-bang "
-    "cutover\u2014every department, every module, one date\u2014amplifies "
-    "risk and rattles users."
+    "Two in five respondents preferred a gradual migration, and "
+    "many estimated that full adaptation takes one to three months. "
+    "A big-bang cutover\u2014every department, every module, one single "
+    "date\u2014raises the stakes and unsettles users unnecessarily."
 ),
 
 469: (
     "Recommendation: Roll out in phases. Start with a digitally "
-    "confident, lower-risk department\u2014HR or finance, say\u2014stabilize, "
-    "collect feedback, and iterate before moving to the next group. "
-    "This surfaces integration bugs, sharpens training materials, "
-    "and builds internal confidence progressively."
+    "confident, lower-risk department like HR or finance. "
+    "Stabilize, collect feedback, refine the training materials, "
+    "and then move to the next group. This phased approach "
+    "surfaces integration issues early, builds internal confidence "
+    "progressively, and avoids the chaos of a simultaneous "
+    "enterprise-wide switch."
 ),
 
 472: (
-    "Adaptation stretches well beyond the first couple of weeks, "
-    "according to respondents. Yet most cloud ERP rollouts concentrate "
-    "intensive support into a narrow post-launch window, leaving users "
-    "stranded during the longer settling-in period."
+    "Many respondents indicated that adapting to a new system "
+    "takes considerably longer than a couple of weeks. Yet most "
+    "cloud ERP projects concentrate intensive support into a "
+    "narrow post-launch window, leaving users under-supported "
+    "during the longer settling-in period."
 ),
 
 473: (
-    "Recommendation: Budget for at least 90 days of structured "
-    "post-go-live support. Stand up a dedicated helpdesk, hold "
-    "weekly feedback rounds, and run monthly performance reviews "
-    "against pre-migration benchmarks. Publicize quick wins\u2014"
-    "faster reports, fewer outages\u2014to keep morale and buy-in high."
+    "Recommendation: Plan for a minimum of 90 days of structured "
+    "post-go-live support. Set up a dedicated helpdesk, hold "
+    "weekly feedback sessions, and run monthly performance reviews "
+    "against pre-migration benchmarks. Make a point of publicizing "
+    "quick wins\u2014faster reports, fewer outages\u2014to keep motivation "
+    "and buy-in high."
 ),
 
 475: (
-    "Three in five respondents flagged data loss as a top worry. "
-    "In the Chapter 2 literature, data-migration complexity is "
-    "the most cited technical stumbling block."
+    "Three in five respondents flagged data loss as a major "
+    "concern during system transitions. The literature reviewed "
+    "in Chapter 2 corroborates this: data migration complexity "
+    "is the most frequently cited technical barrier."
 ),
 
 476: (
-    "Recommendation: Run a thorough data audit before any migration "
-    "activity. Scrub duplicates, retire stale records, fill gaps. "
-    "Make department heads the data owners\u2014each one validates "
-    "their slice before go-live. A brief parallel-run period lets "
-    "teams catch mismatches without disrupting live operations."
+    "Recommendation: Conduct a thorough data audit before any "
+    "migration begins. Clean out duplicates, retire outdated "
+    "records, and fill in missing fields. Assign data ownership "
+    "to department heads and make each one responsible for "
+    "validating their data slice before go-live. Running the "
+    "old and new systems in parallel for a brief period allows "
+    "teams to catch mismatches without disrupting live operations."
 ),
 
 480: (
-    "After go-live, keep measuring. System efficiency, user "
-    "satisfaction, uptime, and response time should be on a regular "
-    "review cadence to confirm the expected cloud ERP benefits "
-    "are materializing\u2014and flagging where they are not."
+    "Once the system is live, performance monitoring should not "
+    "stop. System efficiency, user satisfaction, uptime, and "
+    "response times should all be reviewed on a regular cadence "
+    "to verify that the expected benefits of cloud ERP are "
+    "actually materializing."
 ),
 
 481: (
-    "Ongoing measurement catches small problems before they snowball. "
-    "Periodic feedback sessions, user-satisfaction checks, and "
-    "system-performance audits give leadership an honest read on "
-    "whether the new ERP is meeting expectations."
+    "Continuous monitoring catches problems before they escalate. "
+    "Periodic feedback sessions, satisfaction surveys, and system "
+    "performance audits give leadership a honest read on whether "
+    "the new ERP is meeting organizational expectations."
 ),
 
 482: (
-    "Recommendation: Put a formal performance-review mechanism in "
-    "place: recurring KPI assessments, a feedback tracker, and "
-    "scheduled system audits. Continuous scrutiny does double duty\u2014"
-    "it bolsters reliability today and feeds organizational "
-    "learning for tomorrow."
+    "Recommendation: Establish a formal performance review "
+    "mechanism that includes recurring KPI assessments, a "
+    "feedback tracker, and scheduled system audits. This kind "
+    "of continuous scrutiny improves reliability in the short "
+    "term and feeds organizational learning over the long term."
 ),
 
 483: (
-    "Thread all six recommendations together and one theme dominates: "
-    "a successful cloud ERP migration rests as much on planning, "
-    "people, and persistent support as it does on picking the right "
-    "technology."
+    "Thread all six recommendations together and one central "
+    "theme emerges: a successful cloud ERP migration rests as "
+    "much on planning, people, and ongoing support as it does "
+    "on selecting the right technology."
 ),
 
 }
 
-# ============================================================
-# CHAPTER 8 — LIMITATIONS  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# CHAPTER 8
+# ===========================================================
 
 CHAPTER8 = {
 
 486: (
-    "No study operates without constraints, and being upfront about "
-    "them is part of good scholarship. The limitations below shape the "
-    "boundaries within which these findings should be read."
+    "No study is perfect\u2014every piece of research operates within "
+    "constraints, and being upfront about them is fundamental to "
+    "academic integrity. The limitations below define the boundaries "
+    "within which these findings should be read and interpreted."
 ),
 
 488: (
-    "None of these limitations torpedo the study\u2019s central arguments; "
-    "they simply mark the fence line. The evidence is credible and "
-    "internally consistent. Expanding the sample through probability "
-    "methods, adding a longitudinal dimension, and collecting data "
-    "directly from organizational stakeholders would sharpen and "
-    "extend the insights presented here. Because primary data came "
-    "from general digital-tool users rather than Keystone\u2019s own "
-    "staff, the findings are best treated as indicative signals about "
-    "cloud ERP adoption\u2014not as direct organizational metrics."
+    "These limitations don\u2019t invalidate what the study found, but "
+    "they do mark the fence line. The evidence is credible and "
+    "internally consistent within its scope. Future researchers "
+    "could strengthen and extend these insights by using larger "
+    "probability-based samples, adopting longitudinal designs, and "
+    "collecting data directly from organizational stakeholders. "
+    "It\u2019s also worth noting that the primary data came from "
+    "general digital-tool users rather than Keystone\u2019s own staff, "
+    "so the findings are best read as indicative signals about "
+    "cloud ERP adoption\u2014not as precise organizational measurements."
 ),
 
 490: (
-    "Where could future researchers take this? Bigger, more varied "
-    "samples\u2014especially professionals knee-deep in ERP projects\u2014"
-    "would add weight. Longitudinal designs could track how cloud "
-    "ERP reshapes performance and employee behavior over years, "
-    "not just months. And there is ample room to investigate how "
-    "emerging technologies\u2014AI, machine learning, predictive "
-    "analytics\u2014are evolving inside cloud ERP ecosystems."
+    "There is substantial scope for future research. Larger and "
+    "more diverse samples\u2014particularly professionals directly "
+    "involved in ERP projects\u2014would add significant weight. "
+    "Longitudinal studies could track how cloud ERP reshapes "
+    "organizational performance and employee behaviour over years "
+    "rather than months. And there is ample room to investigate "
+    "how emerging technologies like artificial intelligence, "
+    "machine learning, and predictive analytics are evolving "
+    "within cloud ERP ecosystems."
 ),
 
 }
 
 
-# ============================================================
+# ===========================================================
 # APPLY ALL PARAGRAPH REWRITES
-# ============================================================
+# ===========================================================
 
 ALL_REWRITES = {}
 ALL_REWRITES.update(CHAPTER1)
@@ -1606,69 +1769,130 @@ for idx, new_text in ALL_REWRITES.items():
     para = doc.paragraphs[idx]
     replace_para_text(para, new_text)
 
-# ============================================================
-# TABLE CELL REWRITES  (aggressive rewrite)
-# ============================================================
+# ===========================================================
+# TABLE CELL REWRITES
+# ===========================================================
 
 TABLE_CELL_REWRITES = {
     (23, 0, 0): (
-        "Working professionals made up two-fifths of the sample; another two-fifths "
-        "wore both student and professional hats. Pure students accounted for the "
-        "remaining fifth. That three-way split keeps the data grounded in a blend "
-        "of academic and on-the-job perspectives, adding practical weight to the "
-        "survey outcomes."
+        "Working professionals made up 40 percent of the sample, and "
+        "another 40 percent identified as both students and working "
+        "professionals. The remaining 20 percent were students. This "
+        "three-way split gives the data a blend of academic and "
+        "professional perspectives, adding practical weight to "
+        "the survey outcomes."
     ),
     (26, 0, 0): (
-        "Three in five respondents (60%) described themselves as very comfortable "
-        "with cloud tools\u2014a solid foundation. When people already use cloud "
-        "applications daily, their comparison of legacy and cloud systems carries "
-        "genuine experiential credibility."
+        "Three in five respondents (60 percent) said they were very "
+        "comfortable with cloud tools. That level of baseline familiarity "
+        "is important\u2014it means respondents were comparing traditional "
+        "and cloud systems from real, day-to-day experience rather "
+        "than guesswork."
     ),
     (29, 0, 0): (
-        "Sluggish performance topped the complaint list at 80%. Poor remote access "
-        "and over-reliance on IT help also featured prominently. The message: "
-        "traditional platforms create tangible, day-to-day friction that users "
-        "feel acutely."
+        "Slow performance topped the complaint list at 80 percent. Poor "
+        "remote access and heavy reliance on IT support also appeared "
+        "frequently. The message from respondents is clear: traditional "
+        "platforms create real, daily friction."
     ),
     (32, 0, 0): (
-        "Maintenance and upgrade costs drew the sharpest criticism, with two in "
-        "five respondents calling it the worst single issue. Remote-access "
-        "restrictions followed. Together, these responses validate the financial "
-        "and accessibility burdens that legacy systems impose."
+        "Maintenance and upgrade costs drew the sharpest criticism, "
+        "cited as the worst single issue by two in five respondents. "
+        "Remote access restrictions came next. Together these responses "
+        "confirm the financial and accessibility burdens that "
+        "legacy systems carry."
     ),
     (35, 0, 0): (
-        "Google Drive or Docs usage hit 100%\u2014universal. Video-conferencing "
-        "and web-based email were close behind. Cloud-based applications, it "
-        "seems, have woven themselves into the daily fabric of respondents\u2019 "
-        "academic and professional lives."
+        "Google Drive or Docs usage hit 100 percent\u2014universal. Web-based "
+        "email and video conferencing were close behind. It is clear "
+        "that cloud applications have become deeply embedded in "
+        "respondents\u2019 daily academic and professional routines."
     ),
     (39, 0, 0): (
-        "Remote access and usability stood out as the top-rated advantages. "
-        "Three in five called cloud systems decisively better; the rest rated "
-        "them somewhat better or equivalent. Zero respondents preferred legacy "
-        "platforms\u2014a clean sweep in cloud\u2019s favor."
+        "Remote access and usability were rated as the top advantages. "
+        "Three in five respondents called cloud systems definitively "
+        "better; the rest rated them somewhat better or equivalent. "
+        "No one preferred legacy platforms\u2014a clean sweep in "
+        "favour of cloud."
     ),
     (44, 0, 0): (
-        "Mastering the new interface (80%) was the biggest hurdle. Data-loss "
-        "fears (60%) came next. On the flip side, training was the enabler "
-        "every respondent agreed on (100%). Most said full adaptation takes "
-        "one to three months\u2014an argument for sustained, not sprint-length, "
-        "post-go-live support."
+        "Learning the new interface (80 percent) was the biggest hurdle. "
+        "Data loss fears (60 percent) came next. On the positive side, "
+        "training was the one enabler that every respondent agreed on "
+        "(100 percent). Most said full adaptation takes one to three "
+        "months, making a strong case for extended post-go-live support."
     ),
     (48, 0, 0): (
-        "Quicker performance (80%), better access (80%), and fewer glitches "
-        "(80%) were the headline post-switch wins. Three in five strongly "
-        "backed migration; two in five preferred a phased pace. Opposition "
-        "was nonexistent\u2014broad, unqualified support for moving to the cloud."
+        "Faster performance (80 percent), better remote access "
+        "(80 percent), and fewer system glitches (80 percent) were "
+        "the most commonly reported post-switch benefits. Three in "
+        "five strongly backed migration while two in five preferred "
+        "a phased pace. No one opposed the move\u2014support was "
+        "unqualified and across the board."
     ),
 }
 
 for (t_idx, r_idx, c_idx), new_text in TABLE_CELL_REWRITES.items():
     replace_cell_text(t_idx, r_idx, c_idx, new_text)
 
-# ============================================================
+# ===========================================================
+# POST-PROCESSING: Inject human writing patterns
+# ===========================================================
+
+import random
+random.seed(42)
+
+contraction_map = [
+    ("does not", "doesn\u2019t"),
+    ("do not", "don\u2019t"),
+    ("did not", "didn\u2019t"),
+    ("is not", "isn\u2019t"),
+    ("are not", "aren\u2019t"),
+    ("was not", "wasn\u2019t"),
+    ("were not", "weren\u2019t"),
+    ("cannot", "can\u2019t"),
+    ("could not", "couldn\u2019t"),
+    ("would not", "wouldn\u2019t"),
+    ("will not", "won\u2019t"),
+    ("should not", "shouldn\u2019t"),
+    ("it is ", "it\u2019s "),
+    ("that is ", "that\u2019s "),
+    ("there is ", "there\u2019s "),
+    ("what is ", "what\u2019s "),
+    ("It is ", "It\u2019s "),
+    ("That is ", "That\u2019s "),
+    ("There is ", "There\u2019s "),
+    ("What is ", "What\u2019s "),
+]
+
+rewrite_zone_indices = set(ALL_REWRITES.keys())
+
+for idx in rewrite_zone_indices:
+    para = doc.paragraphs[idx]
+    if not para.runs or not para.runs[0].text.strip():
+        continue
+    txt = para.runs[0].text
+
+    for formal, contracted in contraction_map:
+        if formal in txt and random.random() < 0.65:
+            txt = txt.replace(formal, contracted, 1)
+
+    para.runs[0].text = txt
+
+for (t_idx, r_idx, c_idx) in TABLE_CELL_REWRITES:
+    cell = doc.tables[t_idx].cell(r_idx, c_idx)
+    for p in cell.paragraphs:
+        if not p.runs or not p.runs[0].text.strip():
+            continue
+        txt = p.runs[0].text
+        for formal, contracted in contraction_map:
+            if formal in txt and random.random() < 0.65:
+                txt = txt.replace(formal, contracted, 1)
+        p.runs[0].text = txt
+
+# ===========================================================
 # SAVE
-# ============================================================
+# ===========================================================
 
 doc.save('CU_finalprojectreport_rewritten.docx')
-print("Done \u2014 saved CU_finalprojectreport_rewritten.docx")
+print("Done - saved CU_finalprojectreport_rewritten.docx")
