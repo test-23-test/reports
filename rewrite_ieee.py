@@ -660,7 +660,7 @@ def humanize_text(text):
         (r"(?i)\bwe posit that\b", lambda: _pick(["we think", "our view is that", "we believe"])),
         (r"(?i)\bit has been shown that\b", lambda: _pick(["studies show", "research shows", "evidence says"])),
         (r"(?i)\bthe empirical evidence\b", lambda: _pick(["the data", "the numbers", "what we found"])),
-        (r"(?i)\bempirically\b", lambda: _pick(["experimentally", "through experiments", "with real data"])),
+        (r"(?i)\bempirically\b", lambda: _pick(["experimentally", "practically", "concretely"])),
         (r"(?i)\bsalient\b", lambda: _pick(["key", "standout", "striking"])),
         (r"(?i)\bextant\b", lambda: _pick(["existing", "current"])),
         (r"(?i)\bnon-trivial\b", lambda: _pick(["real", "meaningful", "noteworthy"])),
@@ -686,9 +686,9 @@ def humanize_text(text):
             text = _re.sub(pattern, repl, text)
 
     # ── 21) SENTENCE FRAGMENT CREATION ──
-    # ~6% of sentences get a short fragment prepended
+    # ~12% of sentences get a short fragment prepended
     def _add_fragment(m):
-        if random.random() < 0.06:
+        if random.random() < 0.12:
             frag = _pick([
                 "Worth noting.",
                 "A key point.",
@@ -709,7 +709,7 @@ def humanize_text(text):
     # Move trailing prepositional phrases to front ~8% of sentences
     def _front_load_prep(sent):
         m = _re.search(r'^(.+?)((?:,\s*)?(?:in|on|at|by|for|with|from|through|during|after|before|across)\s+[^.!?]{8,40})[.!?]$', sent, _re.IGNORECASE)
-        if m and random.random() < 0.08:
+        if m and random.random() < 0.15:
             main = m.group(1).rstrip(', ')
             prep = m.group(2).strip().lstrip(', ')
             return prep[0].upper() + prep[1:] + ", " + main[0].lower() + main[1:] + "."
@@ -744,7 +744,7 @@ def humanize_text(text):
         burst_rebuilt = []
         for i, s in enumerate(burst_sents):
             burst_rebuilt.append(s)
-            if len(s.split()) > 20 and random.random() < 0.12:
+            if len(s.split()) > 18 and random.random() < 0.20:
                 mini = _pick([
                     "That matters.", "This is key.", "Big difference.",
                     "Not ideal.", "Good sign.", "Worth noting.",
@@ -753,6 +753,56 @@ def humanize_text(text):
                 ])
                 burst_rebuilt.append(mini)
         text = " ".join(burst_rebuilt)
+
+    # ── 25) CONVERSATIONAL BRIDGES ──
+    # Replace sterile transitions with conversational ones
+    bridge_rules = [
+        (r"(?i)\bThis section\b", lambda: _pick(["Here, we", "In what follows, we", "Next, we"])),
+        (r"(?i)\bThe following section\b", lambda: _pick(["What comes next", "Up next, we", "Below, we"])),
+        (r"(?i)\bThe remainder of\b", lambda: _pick(["The rest of", "What's left of"])),
+        (r"(?i)\bAs discussed (?:above|earlier|previously)\b",
+         lambda: _pick(["Like we mentioned", "As we said", "Going back to what we covered"])),
+        (r"(?i)\bAs mentioned (?:above|earlier|previously)\b",
+         lambda: _pick(["Like we said", "As noted before", "As we touched on"])),
+        (r"(?i)\bIt is important to emphasize\b",
+         lambda: _pick(["We should stress", "Don't overlook the fact", "Worth stressing"])),
+        (r"(?i)\bWe note that\b", lambda: _pick(["Notice that", "Worth pointing out:", "Keep in mind,"])),
+        (r"(?i)\bwe observe that\b", lambda: _pick(["we see that", "what stands out is", "notice how"])),
+        (r"(?i)\bwe hypothesize\b", lambda: _pick(["we think", "our guess is", "our hunch is"])),
+        (r"(?i)\bthe rationale\b", lambda: _pick(["the reasoning", "the thinking", "the logic"])),
+    ]
+    for pattern, repl in bridge_rules:
+        text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
+
+    # ── 26) THAT/WHICH SIMPLIFICATION ──
+    # Trim "that" and "which" clauses to sound more direct ~10%
+    def _trim_relative(m):
+        if random.random() < 0.10:
+            return " - " + m.group(1).strip() + " -"
+        return m.group(0)
+    text = _re.sub(r",?\s*which\s+([^,]{10,50}),?", _trim_relative, text)
+
+    # ── 27) FIRST-PERSON INJECTION ──
+    # Academic text avoids "we" — inject it to sound more human
+    fp_rules = [
+        (r"(?i)\bthe proposed (?:method|approach|framework|system|architecture)\b",
+         lambda: _pick(["our method", "our approach", "the approach we built", "what we propose"])),
+        (r"(?i)\bthe proposed\b", lambda: _pick(["our", "what we propose as"])),
+        (r"(?i)\bthe authors\b", lambda: _pick(["we", "our team"])),
+        (r"(?i)\bthis paper presents\b", lambda: _pick(["we present", "here we lay out", "we describe"])),
+        (r"(?i)\bthis paper proposes\b", lambda: _pick(["we propose", "what we're proposing is"])),
+        (r"(?i)\bthis work introduces\b", lambda: _pick(["we introduce", "here we bring in"])),
+        (r"(?i)\bthis work presents\b", lambda: _pick(["we present", "here we describe"])),
+    ]
+    for pattern, repl in fp_rules:
+        text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
+
+    # ── 28) IMPERSONAL -> DIRECT ADDRESS ──
+    def _direct_addr(m):
+        if random.random() < 0.08:
+            return _pick(["you'll find", "you can see", "notice how", "look at how"])
+        return m.group(0)
+    text = _re.sub(r"(?i)\bone can (?:see|observe|notice|note)\b", _direct_addr, text)
 
     return text
 
@@ -811,10 +861,35 @@ humanized = 0
 cleaned = 0
 skipped = 0
 
+def distribute_text_to_runs(runs, new_text):
+    """Distribute processed text back across runs proportionally to preserve formatting."""
+    orig_lengths = [len(r.text) for r in runs]
+    total_orig = sum(orig_lengths)
+    if total_orig == 0:
+        runs[0].text = new_text
+        return
+
+    new_len = len(new_text)
+    pos = 0
+    for i, run in enumerate(runs):
+        if i == len(runs) - 1:
+            run.text = new_text[pos:]
+        else:
+            share = max(1, int(round(new_len * orig_lengths[i] / total_orig)))
+            # Try to break at a space boundary
+            end = min(pos + share, new_len)
+            if end < new_len:
+                space = new_text.rfind(' ', pos, end + 15)
+                if space > pos:
+                    end = space + 1
+            run.text = new_text[pos:end]
+            pos = end
+
+
 def process_paragraph_wholistic(para, do_restructure=True):
-    """Process paragraph as a single text unit with DOUBLE-PASS humanization."""
+    """Process paragraph with TRIPLE-PASS humanization, preserving run formatting."""
     global restructured, humanized, cleaned
-    runs = para.runs
+    runs = [r for r in para.runs if r.text]
     if not runs:
         return
 
@@ -826,26 +901,26 @@ def process_paragraph_wholistic(para, do_restructure=True):
     if do_restructure:
         processed = restructure_paragraph(processed)
 
-    # PASS 1: full humanization
+    # TRIPLE PASS with different seeds for varied transformations
+    random.seed(hash(full_text[:50]) & 0xFFFFFFFF)
     processed = humanize_text(processed)
-    # PASS 2: re-seed and run again for deeper transformation
+    random.seed((hash(full_text[:50]) + 7919) & 0xFFFFFFFF)
+    processed = humanize_text(processed)
+    random.seed((hash(full_text[:50]) + 15443) & 0xFFFFFFFF)
     processed = humanize_text(processed)
 
     if processed != full_text:
         humanized += 1
+        processed = ai_text_clean(processed)
+        cleaned += 1
 
         if len(runs) == 1:
-            runs[0].text = ai_text_clean(processed)
-            cleaned += 1
-            if do_restructure:
-                restructured += 1
+            runs[0].text = processed
         else:
-            runs[0].text = ai_text_clean(processed)
-            for r in runs[1:]:
-                r.text = ""
-            cleaned += 1
-            if do_restructure:
-                restructured += 1
+            distribute_text_to_runs(runs, processed)
+
+        if do_restructure:
+            restructured += 1
     else:
         for run in runs:
             if run.text:
@@ -859,7 +934,6 @@ for idx, para in enumerate(doc.paragraphs):
     raw = para.text.strip()
     if should_skip(idx, raw):
         skipped += 1
-        # Still clean Unicode artifacts on skipped paragraphs (except refs)
         if idx < REFERENCES_START:
             for run in para.runs:
                 if run.text:
@@ -871,7 +945,6 @@ for idx, para in enumerate(doc.paragraphs):
 
     process_paragraph_wholistic(para, do_restructure=True)
 
-# Also process tables
 for table in doc.tables:
     for row in table.rows:
         for cell in row.cells:
