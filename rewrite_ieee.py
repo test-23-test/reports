@@ -67,15 +67,13 @@ def should_skip(idx, txt):
         return True
     if idx >= REFERENCES_START:
         return True
-    if not txt or len(txt.strip()) < 15:
+    if not txt or len(txt.strip()) < 5:
         return True
     if is_section_header(txt):
         return True
     if is_algorithm_line(txt):
         return True
     if is_formula(txt):
-        return True
-    if is_figure_or_table_caption(txt):
         return True
     return False
 
@@ -380,9 +378,9 @@ def humanize_text(text):
         # Otherwise lowercase
         return cap_letter.lower()
 
-    # 5) SENTENCE OPENER VARIATION — aggressive
+    # 5) SENTENCE OPENER VARIATION
     def _vary_opener(m):
-        if random.random() < 0.22:
+        if random.random() < 0.18:
             prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet ",
                             "Sure, ", "True, ", "Mind you, ", "Of course, ",
                             "Notably, ", "In fact, "])
@@ -424,9 +422,9 @@ def humanize_text(text):
             rebuilt.append(s)
     text = " ".join(rebuilt)
 
-    # 7) INFORMAL DISCOURSE MARKERS — heavy injection
+    # 7) INFORMAL DISCOURSE MARKERS
     def _inject_marker(m):
-        if random.random() < 0.20:
+        if random.random() < 0.15:
             marker = _pick([
                 "Honestly, ", "Frankly, ", "To be fair, ",
                 "In a way, ", "Actually, ", "Really, ",
@@ -442,9 +440,9 @@ def humanize_text(text):
         return m.group(0)
     text = _re.sub(r"(\. )([A-Z])", _inject_marker, text)
 
-    # 8) HEDGING LANGUAGE — much heavier
+    # 8) HEDGING LANGUAGE
     def _hedge(m):
-        if random.random() < 0.18:
+        if random.random() < 0.12:
             h = _pick(["quite ", "fairly ", "rather ", "pretty ", "somewhat ",
                        "arguably ", "relatively ", "reasonably "])
             return h + m.group(0)
@@ -514,7 +512,7 @@ def humanize_text(text):
                 continue
             curr_start = curr_words[0]
             if curr_start == prev_start and curr_start in ("The", "This", "These", "That", "It", "They", "There"):
-                if random.random() < 0.6:
+                if random.random() < 0.80:
                     alt_starters = {
                         "The": ["What stands out about the", "Looking at the", "As for the", "When it comes to the"],
                         "This": ["What this", "Here, this", "In practice, this", "On that note, this"],
@@ -531,7 +529,7 @@ def humanize_text(text):
                         sentences[i] = replacement + " " + rest
         text = " ".join(sentences)
 
-    # 13) PARENTHETICAL ASIDES — heavier
+    # 13) PARENTHETICAL ASIDES
     asides = [
         "(and this matters)", "(which is a big deal)", "(not surprisingly)",
         "(to no one's surprise)", "(as you'd expect)", "(worth keeping in mind)",
@@ -541,7 +539,7 @@ def humanize_text(text):
         "(no kidding)", "(go figure)", "(makes sense)", "(fair point)",
     ]
     def _inject_aside(m):
-        if random.random() < 0.08:
+        if random.random() < 0.06:
             aside = _pick(asides)
             return m.group(0).rstrip() + " " + aside + " "
         return m.group(0)
@@ -579,7 +577,7 @@ def humanize_text(text):
             wc = len(s.split())
             if (wc < 8 and i + 1 < len(merged_sentences)
                     and len(merged_sentences[i + 1].split()) < 8
-                    and random.random() < 0.25):
+                    and random.random() < 0.40):
                 joiner = _pick(["; ", " - ", " and "])
                 next_s = merged_sentences[i + 1]
                 if next_s:
@@ -624,9 +622,9 @@ def humanize_text(text):
     for pattern, replacer in ngram_rules:
         text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
 
-    # 18) EMPHATIC EXPRESSIONS — boosted
+    # 18) EMPHATIC EXPRESSIONS
     def _emphaticize(m):
-        if random.random() < 0.10:
+        if random.random() < 0.08:
             emphatics = [
                 "What really matters here is that ",
                 "The bottom line is, ",
@@ -686,9 +684,9 @@ def humanize_text(text):
             text = _re.sub(pattern, repl, text)
 
     # ── 21) SENTENCE FRAGMENT CREATION ──
-    # ~12% of sentences get a short fragment prepended
+    # ~7% of sentences get a short fragment prepended
     def _add_fragment(m):
-        if random.random() < 0.12:
+        if random.random() < 0.07:
             frag = _pick([
                 "Worth noting.",
                 "A key point.",
@@ -804,6 +802,130 @@ def humanize_text(text):
         return m.group(0)
     text = _re.sub(r"(?i)\bone can (?:see|observe|notice|note)\b", _direct_addr, text)
 
+    # ── 29) WORD-LEVEL SYNONYM PERTURBATION ──
+    # Directly attacks perplexity uniformity by swapping common words
+    syn_map = {
+        "however": ["but", "though", "still", "yet"],
+        "therefore": ["so", "hence", "thus"],
+        "although": ["though", "even though", "while"],
+        "regarding": ["about", "on", "concerning"],
+        "obtain": ["get", "grab", "pull"],
+        "obtained": ["got", "gathered", "pulled"],
+        "achieve": ["get", "reach", "hit"],
+        "achieved": ["got", "reached", "hit"],
+        "achieves": ["gets", "reaches", "hits"],
+        "provide": ["give", "offer", "supply"],
+        "provided": ["gave", "offered", "supplied"],
+        "provides": ["gives", "offers", "supplies"],
+        "require": ["need", "call for", "demand"],
+        "required": ["needed", "called for"],
+        "requires": ["needs", "calls for", "demands"],
+        "indicate": ["show", "suggest", "point to"],
+        "indicates": ["shows", "suggests", "points to"],
+        "indicated": ["showed", "suggested", "pointed to"],
+        "perform": ["do", "carry out", "run"],
+        "performed": ["did", "carried out", "ran"],
+        "performs": ["does", "carries out", "runs"],
+        "maintain": ["keep", "hold", "preserve"],
+        "maintained": ["kept", "held", "preserved"],
+        "consider": ["think about", "look at", "weigh"],
+        "considered": ["thought of as", "seen as", "viewed as"],
+        "establish": ["set up", "build", "create"],
+        "established": ["set up", "built", "created"],
+        "determine": ["figure out", "find", "work out"],
+        "determined": ["figured out", "found", "worked out"],
+        "sufficient": ["enough", "adequate"],
+        "insufficient": ["not enough", "lacking", "too little"],
+        "appropriate": ["right", "fitting", "suitable"],
+        "investigate": ["look into", "explore", "examine"],
+        "investigated": ["looked into", "explored", "examined"],
+        "employ": ["use", "apply", "rely on"],
+        "employed": ["used", "applied", "relied on"],
+        "employs": ["uses", "applies", "relies on"],
+        "subsequently": ["then", "later", "after that"],
+        "prior": ["before", "earlier", "preceding"],
+        "possess": ["have", "hold", "carry"],
+        "possesses": ["has", "holds", "carries"],
+        "demonstrate": ["show", "prove", "reveal"],
+        "demonstrates": ["shows", "proves", "reveals"],
+        "numerous": ["many", "lots of", "plenty of"],
+        "various": ["different", "several", "a range of"],
+        "frequently": ["often", "a lot", "regularly"],
+        "typically": ["usually", "normally", "as a rule"],
+        "generally": ["usually", "mostly", "by and large"],
+        "specifically": ["in particular", "namely", "exactly"],
+        "additionally": ["also", "plus", "on top of that"],
+        "consequently": ["so", "as a result", "because of that"],
+        "approximately": ["about", "roughly", "around"],
+        "significantly": ["a lot", "greatly", "meaningfully"],
+        "substantially": ["a lot", "greatly", "considerably"],
+        "predominantly": ["mostly", "mainly", "largely"],
+        "particularly": ["especially", "mainly", "notably"],
+        "relatively": ["fairly", "pretty", "somewhat"],
+        "inherently": ["naturally", "by nature", "at its core"],
+        "respectively": ["in that order", "correspondingly"],
+        "component": ["part", "piece", "element"],
+        "components": ["parts", "pieces", "elements"],
+        "methodology": ["method", "approach", "technique"],
+        "framework": ["setup", "structure", "system"],
+        "architecture": ["design", "structure", "layout"],
+        "paradigm": ["model", "approach", "pattern"],
+        "mechanism": ["process", "method", "way"],
+        "mechanisms": ["processes", "methods", "ways"],
+        "phenomenon": ["thing", "pattern", "occurrence"],
+        "phenomena": ["patterns", "occurrences", "effects"],
+        "aspect": ["part", "side", "angle"],
+        "aspects": ["parts", "sides", "angles"],
+        "domain": ["field", "area", "space"],
+        "domains": ["fields", "areas", "spaces"],
+        "scenario": ["case", "situation", "setup"],
+        "scenarios": ["cases", "situations", "setups"],
+        "strategy": ["plan", "approach", "tactic"],
+        "strategies": ["plans", "approaches", "tactics"],
+        "limitation": ["drawback", "shortcoming", "weak spot"],
+        "limitations": ["drawbacks", "shortcomings", "weak spots"],
+        "implementation": ["setup", "build", "execution"],
+    }
+    words = text.split()
+    for i, w in enumerate(words):
+        # Skip hyphenated, bracketed, numeric, or very short tokens
+        if '-' in w or '[' in w or ']' in w or any(c.isdigit() for c in w) or len(w) < 3:
+            continue
+        clean = w.strip('.,;:!?()"\' ').lower()
+        if clean in syn_map and random.random() < 0.20:
+            replacement = _pick(syn_map[clean])
+            if w[0].isupper() and not w.isupper():
+                replacement = replacement[0].upper() + replacement[1:]
+            punct_after = ""
+            for c in reversed(w):
+                if c.isalpha():
+                    break
+                punct_after = c + punct_after
+            core = w[:len(w) - len(punct_after)] if punct_after else w
+            punct_before = ""
+            for c in core:
+                if c.isalpha():
+                    break
+                punct_before += c
+            words[i] = punct_before + replacement + punct_after
+    text = " ".join(words)
+
+    # ── 30) SELF-CORRECTION PATTERNS ──
+    def _self_correct(m):
+        if random.random() < 0.02:
+            corrections = [
+                " - or more precisely, ",
+                " - well, actually ",
+                " - to be more exact, ",
+                " (or rather, ",
+            ]
+            corr = _pick(corrections)
+            if corr.startswith(" ("):
+                return m.group(0).rstrip() + corr + m.group(0).strip().lower() + ") "
+            return m.group(0) + corr
+        return m.group(0)
+    text = _re.sub(r"[,]\s(?=[a-z])", _self_correct, text)
+
     return text
 
 
@@ -901,16 +1023,24 @@ def process_paragraph_wholistic(para, do_restructure=True):
     if do_restructure:
         processed = restructure_paragraph(processed)
 
-    # TRIPLE PASS with different seeds for varied transformations
+    # DOUBLE PASS with different seeds
     random.seed(hash(full_text[:50]) & 0xFFFFFFFF)
     processed = humanize_text(processed)
     random.seed((hash(full_text[:50]) + 7919) & 0xFFFFFFFF)
     processed = humanize_text(processed)
-    random.seed((hash(full_text[:50]) + 15443) & 0xFFFFFFFF)
-    processed = humanize_text(processed)
 
     if processed != full_text:
         humanized += 1
+
+        # Post-process: fix stacking artifacts from double-pass
+        # Remove double fragments
+        processed = _re.sub(r'(\. (?:That matters|This is key|Big difference|Not ideal|Good sign|Worth noting|No small thing|Fair enough|Hard to ignore|Think about that|Pretty telling|A key point|Not trivial|Big deal|Makes sense|No surprise there|And here\'s why|One more thing|Quick aside|Important distinction)\.) (?:That matters|This is key|Big difference|Not ideal|Good sign|Worth noting|No small thing|Fair enough|Hard to ignore|Think about that|Pretty telling|A key point|Not trivial|Big deal|Makes sense|No surprise there|And here\'s why|One more thing|Quick aside|Important distinction)\.', r'\1', processed)
+        # Remove comma-period artifacts
+        processed = processed.replace(',.', '.')
+        processed = processed.replace('., .', '.')
+        # Remove double parenthetical asides
+        processed = _re.sub(r'\([^)]{5,35}\)\s*\([^)]{5,35}\)', lambda m: m.group(0).split(')')[0] + ')', processed)
+
         processed = ai_text_clean(processed)
         cleaned += 1
 
