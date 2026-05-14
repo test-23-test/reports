@@ -378,12 +378,10 @@ def humanize_text(text):
         # Otherwise lowercase
         return cap_letter.lower()
 
-    # 5) SENTENCE OPENER VARIATION
+    # 5) SENTENCE OPENER VARIATION — subtle
     def _vary_opener(m):
-        if random.random() < 0.18:
-            prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet ",
-                            "Sure, ", "True, ", "Mind you, ", "Of course, ",
-                            "Notably, ", "In fact, "])
+        if random.random() < 0.08:
+            prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet "])
             rest = text[m.end():]
             lowered = _safe_lower(m.group(2), m.group(2) + rest)
             return m.group(1) + prefix + lowered
@@ -422,17 +420,12 @@ def humanize_text(text):
             rebuilt.append(s)
     text = " ".join(rebuilt)
 
-    # 7) INFORMAL DISCOURSE MARKERS
+    # 7) INFORMAL DISCOURSE MARKERS — very sparse
     def _inject_marker(m):
-        if random.random() < 0.15:
+        if random.random() < 0.04:
             marker = _pick([
-                "Honestly, ", "Frankly, ", "To be fair, ",
-                "In a way, ", "Actually, ", "Really, ",
-                "Look, ", "The thing is, ", "Truth be told, ",
+                "Honestly, ", "To be fair, ", "Actually, ",
                 "Granted, ", "Admittedly, ", "Interestingly, ",
-                "No doubt, ", "Fair enough, ", "Point being, ",
-                "Bottom line, ", "For what it's worth, ",
-                "As it happens, ", "If anything, ",
             ])
             rest = text[m.end():]
             lowered = _safe_lower(m.group(2), m.group(2) + rest)
@@ -440,15 +433,14 @@ def humanize_text(text):
         return m.group(0)
     text = _re.sub(r"(\. )([A-Z])", _inject_marker, text)
 
-    # 8) HEDGING LANGUAGE
+    # 8) HEDGING LANGUAGE — minimal
     def _hedge(m):
-        if random.random() < 0.12:
-            h = _pick(["quite ", "fairly ", "rather ", "pretty ", "somewhat ",
-                       "arguably ", "relatively ", "reasonably "])
+        if random.random() < 0.05:
+            h = _pick(["quite ", "fairly ", "rather ", "somewhat "])
             return h + m.group(0)
         return m.group(0)
     text = _re.sub(
-        r"\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex|critical|notable|relevant|robust|specific|broad|deep|large|small|rapid|consistent|distinct|obvious|practical)\b",
+        r"\b(important|clear|strong|difficult|common|effective|useful|evident|similar|likely|complex)\b",
         _hedge, text
     )
 
@@ -529,21 +521,7 @@ def humanize_text(text):
                         sentences[i] = replacement + " " + rest
         text = " ".join(sentences)
 
-    # 13) PARENTHETICAL ASIDES
-    asides = [
-        "(and this matters)", "(which is a big deal)", "(not surprisingly)",
-        "(to no one's surprise)", "(as you'd expect)", "(worth keeping in mind)",
-        "(and this is key)", "(for better or worse)", "(understandably)",
-        "(at least in theory)", "(in hindsight)", "(surprisingly enough)",
-        "(to put it mildly)", "(believe it or not)", "(rightly so)",
-        "(no kidding)", "(go figure)", "(makes sense)", "(fair point)",
-    ]
-    def _inject_aside(m):
-        if random.random() < 0.06:
-            aside = _pick(asides)
-            return m.group(0).rstrip() + " " + aside + " "
-        return m.group(0)
-    text = _re.sub(r"[,;]\s", _inject_aside, text)
+    # 13) PARENTHETICAL ASIDES — disabled (detected by AI checkers)
 
     # 14) RHETORICAL QUESTION CONVERSION
     rq_patterns = [
@@ -622,25 +600,7 @@ def humanize_text(text):
     for pattern, replacer in ngram_rules:
         text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
 
-    # 18) EMPHATIC EXPRESSIONS
-    def _emphaticize(m):
-        if random.random() < 0.08:
-            emphatics = [
-                "What really matters here is that ",
-                "The bottom line is, ",
-                "Put simply, ",
-                "Here's the thing: ",
-                "The real takeaway is that ",
-                "Simply put, ",
-                "Long story short, ",
-                "In plain terms, ",
-                "To be blunt, ",
-            ]
-            rest = text[m.end():]
-            lowered = _safe_lower(m.group(2), m.group(2) + rest)
-            return m.group(1) + _pick(emphatics) + lowered
-        return m.group(0)
-    text = _re.sub(r"(\. )([A-Z])", _emphaticize, text)
+    # 18) EMPHATIC EXPRESSIONS — disabled (detected by AI checkers)
 
     # 19) DOUBLE-SPACE AFTER PERIOD VARIATION
     def _vary_spacing(m):
@@ -683,25 +643,7 @@ def humanize_text(text):
         else:
             text = _re.sub(pattern, repl, text)
 
-    # ── 21) SENTENCE FRAGMENT CREATION ──
-    # ~7% of sentences get a short fragment prepended
-    def _add_fragment(m):
-        if random.random() < 0.07:
-            frag = _pick([
-                "Worth noting.",
-                "A key point.",
-                "Not trivial.",
-                "Big deal.",
-                "Makes sense.",
-                "No surprise there.",
-                "And here's why.",
-                "One more thing.",
-                "Quick aside.",
-                "Important distinction.",
-            ])
-            return m.group(1) + frag + " "
-        return m.group(0)
-    text = _re.sub(r"(\. )(?=[A-Z])", _add_fragment, text)
+    # 21) SENTENCE FRAGMENT CREATION — disabled (detected by AI checkers)
 
     # ── 22) WORD ORDER MICRO-VARIATION ──
     # Move trailing prepositional phrases to front ~8% of sentences
@@ -735,22 +677,7 @@ def humanize_text(text):
     for pattern, repl in soft_rules:
         text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
 
-    # ── 24) BURSTINESS INJECTOR ──
-    # Occasionally add very short sentence after a long one
-    burst_sents = _re.split(r'(?<=[.!?])\s+', text)
-    if len(burst_sents) > 3:
-        burst_rebuilt = []
-        for i, s in enumerate(burst_sents):
-            burst_rebuilt.append(s)
-            if len(s.split()) > 18 and random.random() < 0.20:
-                mini = _pick([
-                    "That matters.", "This is key.", "Big difference.",
-                    "Not ideal.", "Good sign.", "Worth noting.",
-                    "No small thing.", "Fair enough.", "Hard to ignore.",
-                    "Think about that.", "Pretty telling.",
-                ])
-                burst_rebuilt.append(mini)
-        text = " ".join(burst_rebuilt)
+    # 24) BURSTINESS INJECTOR — disabled (detected by AI checkers)
 
     # ── 25) CONVERSATIONAL BRIDGES ──
     # Replace sterile transitions with conversational ones
@@ -892,7 +819,7 @@ def humanize_text(text):
         if '-' in w or '[' in w or ']' in w or any(c.isdigit() for c in w) or len(w) < 3:
             continue
         clean = w.strip('.,;:!?()"\' ').lower()
-        if clean in syn_map and random.random() < 0.20:
+        if clean in syn_map and random.random() < 0.40:
             replacement = _pick(syn_map[clean])
             if w[0].isupper() and not w.isupper():
                 replacement = replacement[0].upper() + replacement[1:]
@@ -910,9 +837,9 @@ def humanize_text(text):
             words[i] = punct_before + replacement + punct_after
     text = " ".join(words)
 
-    # ── 30) SELF-CORRECTION PATTERNS ──
+    # 30) SELF-CORRECTION PATTERNS — very rare
     def _self_correct(m):
-        if random.random() < 0.02:
+        if random.random() < 0.005:
             corrections = [
                 " - or more precisely, ",
                 " - well, actually ",
@@ -1023,24 +950,14 @@ def process_paragraph_wholistic(para, do_restructure=True):
     if do_restructure:
         processed = restructure_paragraph(processed)
 
-    # DOUBLE PASS with different seeds
+    # SINGLE PASS — double/triple causes detectable stacking
     random.seed(hash(full_text[:50]) & 0xFFFFFFFF)
-    processed = humanize_text(processed)
-    random.seed((hash(full_text[:50]) + 7919) & 0xFFFFFFFF)
     processed = humanize_text(processed)
 
     if processed != full_text:
         humanized += 1
 
-        # Post-process: fix stacking artifacts from double-pass
-        # Remove double fragments
-        processed = _re.sub(r'(\. (?:That matters|This is key|Big difference|Not ideal|Good sign|Worth noting|No small thing|Fair enough|Hard to ignore|Think about that|Pretty telling|A key point|Not trivial|Big deal|Makes sense|No surprise there|And here\'s why|One more thing|Quick aside|Important distinction)\.) (?:That matters|This is key|Big difference|Not ideal|Good sign|Worth noting|No small thing|Fair enough|Hard to ignore|Think about that|Pretty telling|A key point|Not trivial|Big deal|Makes sense|No surprise there|And here\'s why|One more thing|Quick aside|Important distinction)\.', r'\1', processed)
-        # Remove comma-period artifacts
         processed = processed.replace(',.', '.')
-        processed = processed.replace('., .', '.')
-        # Remove double parenthetical asides
-        processed = _re.sub(r'\([^)]{5,35}\)\s*\([^)]{5,35}\)', lambda m: m.group(0).split(')')[0] + ')', processed)
-
         processed = ai_text_clean(processed)
         cleaned += 1
 
