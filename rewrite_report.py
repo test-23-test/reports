@@ -2127,9 +2127,179 @@ def humanize_text(text):
         (r"(?i)\bwere identified\b", lambda: _pick(["stood out", "came up"])),
         (r"(?i)\bis characterized by\b", lambda: _pick(["stands out for", "is known for"])),
         (r"(?i)\bare characterized by\b", lambda: _pick(["stand out for", "are known for"])),
+        (r"(?i)\bwas determined\b", lambda: _pick(["turned out", "came out as"])),
+        (r"(?i)\bwas established\b", lambda: _pick(["came about", "was set up"])),
+        (r"(?i)\bwas implemented\b", lambda: _pick(["went live", "was rolled out", "was put in place"])),
+        (r"(?i)\bwere implemented\b", lambda: _pick(["went live", "were rolled out"])),
+        (r"(?i)\bwas utilized\b", "was used"),
+        (r"(?i)\bwas achieved\b", lambda: _pick(["came through", "worked out"])),
+        (r"(?i)\bwas obtained\b", lambda: _pick(["came in", "was gathered"])),
     ]
     for pattern, replacer in pv2_rules:
         text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
+
+    # ── 12) REPETITIVE SENTENCE-START BREAKING ──
+    # AI tends to start many consecutive sentences with "The", "This", "These"
+    sentences = _re.split(r"(?<=[.!?])\s+", text)
+    if len(sentences) > 2:
+        for i in range(1, len(sentences)):
+            prev_start = sentences[i - 1].split()[0] if sentences[i - 1].split() else ""
+            curr_words = sentences[i].split()
+            if not curr_words:
+                continue
+            curr_start = curr_words[0]
+            if curr_start == prev_start and curr_start in ("The", "This", "These", "That", "It", "They", "There"):
+                if random.random() < 0.6:
+                    alt_starters = {
+                        "The": ["What stands out about the", "Looking at the", "As for the", "When it comes to the"],
+                        "This": ["What this", "Here, this", "In practice, this", "On that note, this"],
+                        "These": ["All these", "Such", "Taken together, these", "Each of these"],
+                        "That": ["And that", "Which is why that", "Notably, that"],
+                        "It": ["What it", "In short, it", "As it turns out, it", "Basically, it"],
+                        "They": ["In practice, they", "What they", "As it happens, they"],
+                        "There": ["As it stands, there", "Right now, there", "In fact, there"],
+                    }
+                    alts = alt_starters.get(curr_start, [])
+                    if alts:
+                        replacement = _pick(alts)
+                        rest = " ".join(curr_words[1:])
+                        sentences[i] = replacement + " " + rest
+        text = " ".join(sentences)
+
+    # ── 13) PARENTHETICAL ASIDES ──
+    # Humans naturally insert brief asides in parentheses
+    asides = [
+        "(and this matters)",
+        "(which is a big deal)",
+        "(not surprisingly)",
+        "(to no one's surprise)",
+        "(as you'd expect)",
+        "(worth keeping in mind)",
+        "(and this is key)",
+        "(for better or worse)",
+        "(understandably)",
+        "(at least in theory)",
+        "(in hindsight)",
+        "(surprisingly enough)",
+        "(to put it mildly)",
+        "(believe it or not)",
+        "(rightly so)",
+    ]
+
+    def _inject_aside(m):
+        if random.random() < 0.04:
+            aside = _pick(asides)
+            return m.group(0).rstrip() + " " + aside + " "
+        return m.group(0)
+    text = _re.sub(r"[,;]\s", _inject_aside, text)
+
+    # ── 14) RHETORICAL QUESTION CONVERSION ──
+    # Convert ~4% of declarative statements to rhetorical questions
+    rq_patterns = [
+        (r"(?i)\bIt is (clear|obvious|evident|apparent) that (.+?)\.", lambda m:
+            _pick(["Isn't it " + m.group(1) + " that " + m.group(2) + "?",
+                   "Can anyone deny that " + m.group(2) + "?",
+                   "Who would argue that " + m.group(2) + " isn't the case?"])),
+        (r"(?i)\bEveryone (knows|agrees|understands) that (.+?)\.", lambda m:
+            "Does everyone really " + m.group(1).rstrip("s") + " that " + m.group(2) + "?"),
+        (r"(?i)\bThe (answer|reason|explanation) is (simple|straightforward|clear)[.:] (.+?)\.", lambda m:
+            "So what's the " + m.group(1) + "? " + m.group(3)[0].upper() + m.group(3)[1:] + "."),
+    ]
+    for pattern, replacer in rq_patterns:
+        if random.random() < 0.5:
+            text = _re.sub(pattern, replacer, text, count=1)
+
+    # ── 15) CLAUSE REORDERING ──
+    # Move "because X, Y" to "Y, because X" and vice versa (~15% of matches)
+    def _reorder_because(m):
+        if random.random() < 0.15:
+            reason = m.group(1).strip().rstrip(",")
+            main = m.group(2).strip()
+            if main and reason:
+                return main[0].upper() + main[1:] + ", because " + reason[0].lower() + reason[1:]
+        return m.group(0)
+    text = _re.sub(r"\b[Bb]ecause ([^,]+), ([^.!?]+[.!?])", _reorder_because, text)
+
+    # ── 16) SENTENCE MERGING ──
+    # Merge very short consecutive sentences (both <8 words) with semicolons or dashes
+    merged_sentences = _re.split(r"(?<=[.!?])\s+", text)
+    if len(merged_sentences) > 2:
+        rebuilt2 = []
+        i = 0
+        while i < len(merged_sentences):
+            s = merged_sentences[i]
+            wc = len(s.split())
+            if (wc < 8 and i + 1 < len(merged_sentences)
+                    and len(merged_sentences[i + 1].split()) < 8
+                    and random.random() < 0.25):
+                joiner = _pick(["; ", " - ", " and "])
+                next_s = merged_sentences[i + 1]
+                if next_s:
+                    combined = s.rstrip(".!?") + joiner + next_s[0].lower() + next_s[1:]
+                    rebuilt2.append(combined)
+                    i += 2
+                    continue
+            rebuilt2.append(s)
+            i += 1
+        text = " ".join(rebuilt2)
+
+    # ── 17) AI N-GRAM PATTERN BREAKING ──
+    # Common AI multi-word patterns that humans rarely use in the same way
+    ngram_rules = [
+        (r"(?i)\bIt is worth noting\b", lambda: _pick(["Keep in mind", "Notice", "One thing to note"])),
+        (r"(?i)\bThis is particularly true\b", lambda: _pick(["This really shows", "You see this especially"])),
+        (r"(?i)\bThis is especially the case\b", lambda: _pick(["This really holds", "You notice this most"])),
+        (r"(?i)\bA growing body of\b", lambda: _pick(["More and more", "A lot of recent"])),
+        (r"(?i)\bIn light of\b", lambda: _pick(["Given", "Considering", "Because of"])),
+        (r"(?i)\bOn the other hand\b", lambda: _pick(["Then again", "But", "That said"])),
+        (r"(?i)\bIn this regard\b", lambda: _pick(["On that front", "Here", "In this area"])),
+        (r"(?i)\bFrom this perspective\b", lambda: _pick(["Seen this way", "Looked at like that"])),
+        (r"(?i)\bIt is imperative that\b", lambda: _pick(["It's critical that", "We really need to"])),
+        (r"(?i)\bThis suggests that\b", lambda: _pick(["That points to", "Which hints that", "So it seems"])),
+        (r"(?i)\bThis indicates that\b", lambda: _pick(["That shows", "Which tells us", "So it looks like"])),
+        (r"(?i)\bThis implies that\b", lambda: _pick(["That means", "Which suggests", "So basically"])),
+        (r"(?i)\bIt is essential to\b", lambda: _pick(["You really need to", "It's critical to", "The key thing is to"])),
+        (r"(?i)\bplay(?:s)? an important role\b", lambda: _pick(["matter a lot", "count for a lot", "carry real weight"])),
+        (r"(?i)\bserves as a\b", lambda: _pick(["works as a", "acts as a", "doubles as a"])),
+        (r"(?i)\ba key factor\b", lambda: _pick(["a big driver", "a real factor", "something that matters"])),
+        (r"(?i)\ba critical component\b", lambda: _pick(["a core piece", "something essential", "a must-have part"])),
+        (r"(?i)\bin today's (?:digital|modern|contemporary) (?:age|era|world)\b",
+         lambda: _pick(["nowadays", "today", "these days", "in the current climate"])),
+        (r"(?i)\bthe landscape of\b", lambda: _pick(["the world of", "the state of", "how things stand in"])),
+        (r"(?i)\bpaves the way for\b", lambda: _pick(["opens the door to", "sets the stage for", "makes room for"])),
+        (r"(?i)\bshed(?:s)? light on\b", lambda: _pick(["clarifies", "helps explain", "brings clarity to"])),
+        (r"(?i)\btake(?:s)? into account\b", lambda: _pick(["factor in", "consider", "keep in mind"])),
+        (r"(?i)\bthe findings suggest\b", lambda: _pick(["the results point to", "what came out is", "the data shows"])),
+        (r"(?i)\bthe results indicate\b", lambda: _pick(["the numbers show", "what we found is", "the data tells us"])),
+        (r"(?i)\bas a whole\b", lambda: _pick(["overall", "all in all", "taken together"])),
+        (r"(?i)\bgiven the fact that\b", lambda: _pick(["since", "because", "considering"])),
+    ]
+    for pattern, replacer in ngram_rules:
+        text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
+
+    # ── 18) EMPHATIC EXPRESSIONS ──
+    # Occasionally strengthen weak statements with human emphasis
+    def _emphaticize(m):
+        if random.random() < 0.04:
+            emphatics = [
+                "What really matters here is that ",
+                "The bottom line is, ",
+                "Put simply, ",
+                "Here's the thing: ",
+                "The real takeaway is that ",
+                "Simply put, ",
+            ]
+            return m.group(1) + _pick(emphatics) + m.group(2).lower()
+        return m.group(0)
+    text = _re.sub(r"(\. )([A-Z])", _emphaticize, text)
+
+    # ── 19) DOUBLE-SPACE AFTER PERIOD VARIATION ──
+    # Some humans use double spaces; mix in a few to break uniformity
+    def _vary_spacing(m):
+        if random.random() < 0.08:
+            return ".  " + m.group(1)
+        return ". " + m.group(1)
+    text = _re.sub(r"\. ([A-Z])", _vary_spacing, text)
 
     return text
 

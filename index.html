@@ -588,6 +588,85 @@
       }
       if(pvc) stats.push(['Passive voice humanized', pvc]);
 
+      // 11) Repetitive sentence-start breaking
+      let rsb = 0;
+      const sents = text.split(/(?<=[.!?])\s+/);
+      if(sents.length > 2){
+        for(let i=1;i<sents.length;i++){
+          const prevW = (sents[i-1].split(/\s+/)[0])||'';
+          const curW = (sents[i].split(/\s+/)[0])||'';
+          if(curW===prevW && ['The','This','These','That','It','They','There'].includes(curW) && rand()<0.6){
+            rsb++;
+            const alts={
+              The:['Looking at the','As for the','When it comes to the'],
+              This:['Here, this','In practice, this','On that note, this'],
+              These:['All these','Taken together, these','Each of these'],
+              That:['And that','Notably, that'],
+              It:['In short, it','As it turns out, it','Basically, it'],
+              They:['In practice, they','As it happens, they'],
+              There:['As it stands, there','Right now, there','In fact, there']
+            };
+            const opts=alts[curW]||[];
+            if(opts.length){
+              const rest=sents[i].split(/\s+/).slice(1).join(' ');
+              sents[i]=pick(opts)+' '+rest;
+            }
+          }
+        }
+        text=sents.join(' ');
+      }
+      if(rsb) stats.push(['Repetitive starts varied', rsb]);
+
+      // 12) Parenthetical asides
+      let pa=0;
+      const asides=['(and this matters)','(which is a big deal)','(not surprisingly)','(as you\'d expect)',
+        '(worth keeping in mind)','(and this is key)','(for better or worse)','(understandably)',
+        '(at least in theory)','(surprisingly enough)','(to put it mildly)','(rightly so)'];
+      text=text.replace(/[,;]\s/g,(m)=>{
+        if(rand()<0.04){pa++;return m.trimEnd()+' '+pick(asides)+' ';}
+        return m;
+      });
+      if(pa) stats.push(['Parenthetical asides added', pa]);
+
+      // 13) AI n-gram pattern breaking
+      let ng=0;
+      const ngRules=[
+        [/\bIt is worth noting\b/gi,()=>pick(['Keep in mind','Notice','One thing to note'])],
+        [/\bThis is particularly true\b/gi,()=>pick(['This really shows','You see this especially'])],
+        [/\bA growing body of\b/gi,()=>pick(['More and more','A lot of recent'])],
+        [/\bIn light of\b/gi,()=>pick(['Given','Considering','Because of'])],
+        [/\bOn the other hand\b/gi,()=>pick(['Then again','But','That said'])],
+        [/\bIn this regard\b/gi,()=>pick(['On that front','Here','In this area'])],
+        [/\bThis suggests that\b/gi,()=>pick(['That points to','Which hints that','So it seems'])],
+        [/\bThis indicates that\b/gi,()=>pick(['That shows','Which tells us','So it looks like'])],
+        [/\bThis implies that\b/gi,()=>pick(['That means','Which suggests','So basically'])],
+        [/\bIt is essential to\b/gi,()=>pick(["You really need to","It's critical to"])],
+        [/\bserves as a\b/gi,()=>pick(['works as a','acts as a','doubles as a'])],
+        [/\ba key factor\b/gi,()=>pick(['a big driver','a real factor','something that matters'])],
+        [/\bin today's (?:digital|modern|contemporary) (?:age|era|world)\b/gi,()=>pick(['nowadays','today','these days'])],
+        [/\bpaves the way for\b/gi,()=>pick(['opens the door to','sets the stage for'])],
+        [/\bsheds? light on\b/gi,()=>pick(['clarifies','helps explain'])],
+        [/\bthe findings suggest\b/gi,()=>pick(['the results point to','the data shows'])],
+        [/\bthe results indicate\b/gi,()=>pick(['the numbers show','the data tells us'])],
+        [/\bas a whole\b/gi,()=>pick(['overall','all in all','taken together'])],
+        [/\bgiven the fact that\b/gi,()=>pick(['since','because','considering'])],
+      ];
+      for(const [re,fn] of ngRules){
+        const b=text;
+        text=text.replace(re,()=>{ng++;return fn();});
+      }
+      if(ng) stats.push(['AI n-grams broken', ng]);
+
+      // 14) Emphatic expressions at ~4% of sentence boundaries
+      let em=0;
+      text=text.replace(/(\. )([A-Z])/g,(m,dot,letter)=>{
+        if(rand()<0.04){em++;
+          return dot+pick(['Put simply, ','Here\'s the thing: ','The bottom line is, ','Simply put, '])+letter.toLowerCase();
+        }
+        return m;
+      });
+      if(em) stats.push(['Emphatic touches added', em]);
+
       return { text, stats };
     }
 

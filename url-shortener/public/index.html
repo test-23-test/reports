@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Snip - URL Shortener</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0a0e1a;--surface:#111827;--border:#1e293b;
+      --text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;
+      --accent-hover:#818cf8;--success:#22c55e;--danger:#ef4444;
+      --radius:12px;
+      --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;line-height:1.6}
+    a{color:var(--accent-hover);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .container{max-width:720px;margin:0 auto;padding:40px 20px}
+
+    header{text-align:center;margin-bottom:48px}
+    header h1{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+    header p{color:var(--muted);font-size:1.05rem}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+
+    .input-group{display:flex;gap:10px;margin-bottom:12px}
+    .input-group input{flex:1;padding:14px 16px;background:#0f172a;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
+    .input-group input:focus{border-color:var(--accent)}
+    .input-group input::placeholder{color:#475569}
+
+    .custom-row{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+    .custom-row label{color:var(--muted);font-size:.85rem;white-space:nowrap}
+    .custom-row input{flex:1;padding:10px 14px;background:#0f172a;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;font-family:var(--mono)}
+    .custom-row input:focus{border-color:var(--accent)}
+
+    .btn{padding:14px 28px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,.4)}
+    .btn-sm{padding:8px 16px;font-size:.85rem;border-radius:8px}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+
+    .result{display:none;margin-top:20px;padding:20px;background:#0f172a;border:1px solid var(--border);border-radius:var(--radius);animation:slideIn .3s ease}
+    .result.active{display:block}
+    .result-url{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .result-url a{font-size:1.2rem;font-weight:600;color:var(--accent-hover);word-break:break-all}
+    .result-meta{color:var(--muted);font-size:.85rem}
+    .result-meta span{margin-right:16px}
+    .copied{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+    .copied.show{opacity:1}
+
+    .stats-bar{display:flex;gap:16px;margin-bottom:24px}
+    .stat-card{flex:1;text-align:center;padding:16px;background:#0f172a;border:1px solid var(--border);border-radius:var(--radius)}
+    .stat-card .num{font-size:1.8rem;font-weight:800;color:var(--accent-hover)}
+    .stat-card .label{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+
+    .url-list{list-style:none}
+    .url-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+    .url-item:last-child{border-bottom:none}
+    .url-info{flex:1;min-width:0}
+    .url-short{font-family:var(--mono);font-weight:600;color:var(--accent-hover);font-size:.95rem}
+    .url-original{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px;display:block;margin-top:2px}
+    .url-clicks{text-align:right;min-width:80px}
+    .url-clicks .num{font-weight:700;font-size:1.1rem}
+    .url-clicks .label{color:var(--muted);font-size:.75rem}
+
+    .empty{text-align:center;padding:40px;color:var(--muted)}
+    .empty svg{margin-bottom:12px;opacity:.4}
+
+    .error{color:var(--danger);font-size:.9rem;margin-top:8px;display:none}
+    .error.active{display:block}
+
+    @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:600px){
+      .input-group{flex-direction:column}
+      .stats-bar{flex-direction:column}
+      .url-item{flex-direction:column;align-items:flex-start;gap:8px}
+      .url-clicks{text-align:left}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Snip</h1>
+      <p>Fast, clean URL shortening with analytics</p>
+    </header>
+
+    <div class="card">
+      <div class="input-group">
+        <input type="url" id="urlInput" placeholder="Paste a long URL here..." autofocus>
+        <button class="btn btn-primary" id="shortenBtn">Shorten</button>
+      </div>
+      <div class="custom-row">
+        <label for="customCode">Custom alias (optional):</label>
+        <input type="text" id="customCode" placeholder="my-link">
+      </div>
+      <div class="error" id="error"></div>
+      <div class="result" id="result">
+        <div class="result-url">
+          <a id="shortLink" href="#" target="_blank"></a>
+          <button class="btn btn-sm btn-ghost" id="copyBtn">Copy</button>
+        </div>
+        <div class="result-meta">
+          <span id="resultOriginal"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="num" id="totalUrls">0</div>
+        <div class="label">Links Created</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="totalClicks">0</div>
+        <div class="label">Total Clicks</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:16px;font-weight:700">Recent Links</h3>
+      <ul class="url-list" id="urlList">
+        <li class="empty">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m9.86-4.242a4.5 4.5 0 0 0-1.242-7.244l4.5-4.5a4.5 4.5 0 0 1 6.364 6.364l-1.757 1.757"/></svg>
+          <p>No links yet. Shorten your first URL above.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="copied" id="toast">Copied to clipboard!</div>
+
+  <script>
+  (function(){
+    const urlInput = document.getElementById('urlInput');
+    const customCode = document.getElementById('customCode');
+    const shortenBtn = document.getElementById('shortenBtn');
+    const result = document.getElementById('result');
+    const shortLink = document.getElementById('shortLink');
+    const resultOriginal = document.getElementById('resultOriginal');
+    const copyBtn = document.getElementById('copyBtn');
+    const errorEl = document.getElementById('error');
+    const toast = document.getElementById('toast');
+    const urlList = document.getElementById('urlList');
+    const totalUrlsEl = document.getElementById('totalUrls');
+    const totalClicksEl = document.getElementById('totalClicks');
+
+    function showError(msg){
+      errorEl.textContent = msg;
+      errorEl.classList.add('active');
+      result.classList.remove('active');
+    }
+    function hideError(){ errorEl.classList.remove('active'); }
+
+    function showToast(msg){
+      toast.textContent = msg || 'Copied to clipboard!';
+      toast.classList.add('show');
+      setTimeout(()=> toast.classList.remove('show'), 1800);
+    }
+
+    function timeAgo(dateStr){
+      if(!dateStr) return '';
+      const diff = Date.now() - new Date(dateStr + 'Z').getTime();
+      const mins = Math.floor(diff/60000);
+      if(mins < 1) return 'just now';
+      if(mins < 60) return mins + 'm ago';
+      const hrs = Math.floor(mins/60);
+      if(hrs < 24) return hrs + 'h ago';
+      const days = Math.floor(hrs/24);
+      return days + 'd ago';
+    }
+
+    function renderList(data){
+      totalUrlsEl.textContent = data.totalUrls.toLocaleString();
+      totalClicksEl.textContent = data.totalClicks.toLocaleString();
+
+      if(!data.urls.length){
+        urlList.innerHTML = `<li class="empty">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m9.86-4.242a4.5 4.5 0 0 0-1.242-7.244l4.5-4.5a4.5 4.5 0 0 1 6.364 6.364l-1.757 1.757"/></svg>
+          <p>No links yet. Shorten your first URL above.</p></li>`;
+        return;
+      }
+
+      urlList.innerHTML = data.urls.map(u => `
+        <li class="url-item">
+          <div class="url-info">
+            <a class="url-short" href="${u.shortUrl}" target="_blank">${u.shortUrl.replace(/^https?:\/\//,'')}</a>
+            <span class="url-original" title="${u.original}">${u.original}</span>
+          </div>
+          <div class="url-clicks">
+            <div class="num">${u.clicks.toLocaleString()}</div>
+            <div class="label">${u.clicks === 1 ? 'click' : 'clicks'}</div>
+          </div>
+        </li>`).join('');
+    }
+
+    async function loadRecent(){
+      try{
+        const res = await fetch('/api/recent');
+        const data = await res.json();
+        renderList(data);
+      }catch(e){ console.error(e); }
+    }
+
+    async function shorten(){
+      hideError();
+      const url = urlInput.value.trim();
+      if(!url){ showError('Please enter a URL'); return; }
+
+      shortenBtn.disabled = true;
+      shortenBtn.textContent = '...';
+
+      try{
+        const body = { url };
+        const custom = customCode.value.trim();
+        if(custom) body.customCode = custom;
+
+        const res = await fetch('/api/shorten', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if(!res.ok){
+          showError(data.error || 'Something went wrong');
+          return;
+        }
+
+        shortLink.href = data.shortUrl;
+        shortLink.textContent = data.shortUrl;
+        resultOriginal.textContent = data.original;
+        result.classList.add('active');
+        urlInput.value = '';
+        customCode.value = '';
+
+        loadRecent();
+      }catch(e){
+        showError('Network error. Is the server running?');
+      }finally{
+        shortenBtn.disabled = false;
+        shortenBtn.textContent = 'Shorten';
+      }
+    }
+
+    shortenBtn.addEventListener('click', shorten);
+    urlInput.addEventListener('keydown', e => { if(e.key==='Enter') shorten(); });
+    customCode.addEventListener('keydown', e => { if(e.key==='Enter') shorten(); });
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(shortLink.href);
+        showToast();
+      }catch{
+        const ta = document.createElement('textarea');
+        ta.value = shortLink.href;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast();
+      }
+    });
+
+    loadRecent();
+  })();
+  </script>
+</body>
+</html>
