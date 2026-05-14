@@ -1,8 +1,11 @@
 """
-IEEE paper humanizer v3 — sentence-level restructuring + word-level changes.
-AI detectors measure sentence STRUCTURE patterns, not just vocabulary.
-This version adds: clause reordering, sentence merging/splitting,
-prepositional phrase fronting, and aggressive synonym perturbation.
+IEEE paper humanizer v4 — maximum restructuring per the full humanization prompt.
+Key upgrades over v3:
+  - Higher restructuring rates (45% clause reorder, 50% merge, 55% split, 35% front, 30% voice)
+  - Paragraph opener variation (first sentence of each para gets restructured at 60%)
+  - 60% synonym perturbation rate with 220+ academic synonyms
+  - Sentence length burstiness enforcement
+  - Consecutive same-starter breaking
 """
 import sys, io, re as _re, unicodedata as _ud
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -74,18 +77,15 @@ class PRNG:
         return arr[int(self.rand() * len(arr))]
 
 
-# ==============================================================
-# SENTENCE SPLITTER — respects citations like [1], [2]-[5]
-# ==============================================================
 def split_sentences(text):
     parts = _re.split(r'(?<=[.!?])\s+(?=[A-Z])', text)
     return [p.strip() for p in parts if p.strip()]
 
 
 # ==============================================================
-# SENTENCE-LEVEL RESTRUCTURING — changes actual sentence patterns
+# SENTENCE-LEVEL RESTRUCTURING — boosted rates
 # ==============================================================
-def restructure_sentences(sentences, rng):
+def restructure_sentences(sentences, rng, is_para_start=False):
     result = []
     i = 0
     while i < len(sentences):
@@ -93,63 +93,64 @@ def restructure_sentences(sentences, rng):
         words = s.split()
         wc = len(words)
 
-        # Skip sentences with citations or very short/technical ones
         if has_citation(s) or wc < 6 or is_formula(s):
             result.append(s)
             i += 1
             continue
 
-        # --- A) CLAUSE REORDERING: "X because/since/while Y" → "Because/Since/While Y, X" ---
-        if rng.rand() < 0.35:
+        boost = 0.15 if (is_para_start and i == 0) else 0.0
+
+        # A) CLAUSE REORDERING — 45% (60% for para openers)
+        if rng.rand() < (0.45 + boost):
             reordered = False
             for conj, front in [(" because ", "Because "), (" since ", "Since "),
                                 (" although ", "Although "), (" while ", "While "),
-                                (" when ", "When "), (" whereas ", "While ")]:
+                                (" when ", "When "), (" whereas ", "While "),
+                                (" as ", "As "), (" even though ", "Even though ")]:
                 idx = s.lower().find(conj, max(15, len(s) // 4))
                 if idx > 0 and not has_citation(s[idx:]):
-                    main_clause = s[:idx].rstrip()
-                    sub_clause = s[idx + len(conj):].strip()
-                    if len(sub_clause.split()) >= 4 and len(main_clause.split()) >= 4:
-                        if main_clause[0].isupper():
-                            main_clause = main_clause[0].lower() + main_clause[1:]
-                        if sub_clause[-1] in '.!?':
-                            sub_clause = sub_clause[:-1]
-                        new_s = front + sub_clause + ", " + main_clause + "."
-                        result.append(new_s)
+                    main = s[:idx].rstrip()
+                    sub = s[idx + len(conj):].strip()
+                    if len(sub.split()) >= 4 and len(main.split()) >= 4:
+                        if main[0].isupper():
+                            main = main[0].lower() + main[1:]
+                        if sub[-1] in '.!?':
+                            sub = sub[:-1]
+                        result.append(front + sub + ", " + main + ".")
                         reordered = True
                         break
             if reordered:
                 i += 1
                 continue
 
-        # --- B) MERGE SHORT ADJACENT SENTENCES (< 12 words each) ---
+        # B) MERGE SHORT SENTENCES — 50%
         if wc < 12 and i + 1 < len(sentences):
-            next_s = sentences[i + 1]
-            next_wc = len(next_s.split())
-            if next_wc < 12 and not has_citation(next_s) and rng.rand() < 0.40:
-                conj = rng.pick([", and ", ", so ", " - ", "; "])
+            nxt = sentences[i + 1]
+            nwc = len(nxt.split())
+            if nwc < 12 and not has_citation(nxt) and rng.rand() < 0.50:
+                conj = rng.pick([", and ", ", so ", " - ", "; ", " and also "])
                 first = s.rstrip('.')
-                second = next_s
+                second = nxt
                 if second and second[0].isupper():
                     second = second[0].lower() + second[1:]
                 result.append(first + conj + second)
                 i += 2
                 continue
 
-        # --- C) SPLIT LONG SENTENCES (> 28 words) at conjunctions ---
-        if wc > 28 and rng.rand() < 0.45:
+        # C) SPLIT LONG SENTENCES — 55% for >25 words
+        if wc > 25 and rng.rand() < 0.55:
             split_done = False
-            for conj in [", and ", ", but ", ", yet ", " however ", ", which "]:
+            for conj in [", and ", ", but ", ", yet ", " however ", ", which ", ", where "]:
                 idx = s.find(conj, max(20, len(s) // 3))
                 if idx > 0 and not has_citation(s[idx:idx+20]):
                     first = s[:idx].rstrip()
-                    if not first.endswith(('.', '!', '?')):
+                    if not first.endswith(('.','!','?')):
                         first += '.'
                     rest = s[idx + len(conj):].strip()
                     if rest and len(rest.split()) > 4:
                         rest = rest[0].upper() + rest[1:]
-                        if conj.strip() == "which":
-                            rest = "This " + rest
+                        if conj.strip() in ("which", "where"):
+                            rest = "This " + rest[0].lower() + rest[1:]
                         result.append(first)
                         result.append(rest)
                         split_done = True
@@ -158,38 +159,48 @@ def restructure_sentences(sentences, rng):
                 i += 1
                 continue
 
-        # --- D) FRONTING: move trailing prepositional phrase to front ---
-        if rng.rand() < 0.25 and wc > 10:
-            m = _re.search(r',\s+((?:in|with|for|by|through|during|across|over|under|using)\s+[^,\.]+)[\.!?]$', s, _re.I)
+        # D) PREPOSITIONAL PHRASE FRONTING — 35%
+        if rng.rand() < (0.35 + boost) and wc > 10:
+            m = _re.search(r',\s+((?:in|with|for|by|through|during|across|over|under|using|via|from)\s+[^,\.]+)[\.!?]$', s, _re.I)
             if m and not has_citation(m.group(1)):
                 phrase = m.group(1).strip()
                 main = s[:m.start()].rstrip()
                 if main and main[0].isupper():
                     main = main[0].lower() + main[1:]
-                new_s = phrase[0].upper() + phrase[1:] + ", " + main + "."
-                result.append(new_s)
+                result.append(phrase[0].upper() + phrase[1:] + ", " + main + ".")
                 i += 1
                 continue
 
-        # --- E) PASSIVE/ACTIVE VOICE FLIP (structural, not just word swap) ---
-        if rng.rand() < 0.20:
-            m = _re.match(r'^(.+?)\s+(shows?|demonstrates?|reveals?|indicates?|confirms?|suggests?|provides?)\s+that\s+(.+)$', s, _re.I)
-            if m and not has_citation(m.group(1)):
+        # E) ACTIVE/PASSIVE VOICE FLIP — 30%
+        if rng.rand() < 0.30:
+            m = _re.match(r'^(.+?)\s+(shows?|demonstrates?|reveals?|indicates?|confirms?|suggests?|provides?|achieves?|produces?|generates?)\s+(?:that\s+)?(.+)$', s, _re.I)
+            if m and not has_citation(m.group(1)) and len(m.group(3).split()) > 4:
                 subject = m.group(1).rstrip(',')
-                verb = m.group(2)
                 rest = m.group(3)
                 if rest and rest[0].islower():
                     rest = rest[0].upper() + rest[1:]
                 connector = rng.pick(["as shown by", "as seen from", "according to", "based on"])
-                if rest[-1] not in '.!?':
-                    rest += '.'
-                else:
-                    rest = rest[:-1] + "."
-                new_s = rest[:-1] + ", " + connector + " " + subject.lower() + "."
-                if len(new_s.split()) > 5:
+                if rest[-1] in '.!?':
+                    rest = rest[:-1]
+                new_s = rest + ", " + connector + " " + subject[0].lower() + subject[1:] + "."
+                if len(new_s.split()) > 6:
                     result.append(new_s)
                     i += 1
                     continue
+
+        # F) PARAGRAPH OPENER: rephrase "This/The X verb Y" → "Y is verb-ed by X" for first sentence
+        if is_para_start and i == 0 and rng.rand() < 0.40:
+            m = _re.match(r'^(The|This|These|Our)\s+(.+?)\s+(is|are|was|were|has|have)\s+(.+)$', s, _re.I)
+            if m and not has_citation(s):
+                det = m.group(1)
+                subj = m.group(2)
+                verb = m.group(3)
+                rest = m.group(4)
+                starters = ["Looking at ", "Turning to ", "Regarding ", "Considering ", "With respect to "]
+                new_s = rng.pick(starters) + det.lower() + " " + subj + ", it " + verb + " " + rest
+                result.append(new_s)
+                i += 1
+                continue
 
         result.append(s)
         i += 1
@@ -198,33 +209,63 @@ def restructure_sentences(sentences, rng):
 
 
 # ==============================================================
-# WORD-LEVEL HUMANIZATION (existing rules from previous version)
+# CONSECUTIVE SAME-STARTER BREAKER
+# ==============================================================
+def break_same_starters(sentences, rng):
+    if len(sentences) < 3:
+        return sentences
+    for i in range(2, len(sentences)):
+        words_prev2 = sentences[i-2].split()
+        words_prev1 = sentences[i-1].split()
+        words_curr = sentences[i].split()
+        if not words_prev2 or not words_prev1 or not words_curr:
+            continue
+        if words_prev2[0] == words_prev1[0] == words_curr[0]:
+            starter = words_curr[0]
+            rest = " ".join(words_curr[1:])
+            alts = {
+                "The": ["For the", "Regarding the", "As for the", "Concerning the"],
+                "This": ["Such a", "That kind of", "A similar"],
+                "These": ["Such", "All these", "Those"],
+                "It": ["One can see it", "Notably, it", "As expected, it"],
+                "They": ["Those models", "All of them", "Each one"],
+                "We": ["Our team", "The authors", "In our work, we"],
+                "There": ["One finds", "Notably, there", "In practice, there"],
+            }
+            if starter in alts:
+                new_start = rng.pick(alts[starter])
+                sentences[i] = new_start + " " + rest
+    return sentences
+
+
+# ==============================================================
+# WORD-LEVEL HUMANIZATION
 # ==============================================================
 def humanize_words(text, rng):
     # Transition words
     tr_rules = [
-        (r"\bFurthermore,?\s", lambda: rng.pick(["Also, ", "In addition, ", "Equally, "])),
-        (r"\bMoreover,?\s", lambda: rng.pick(["Also, ", "Beyond that, ", "On top of that, "])),
-        (r"\bAdditionally,?\s", lambda: rng.pick(["Also, ", "On top of this, ", "Equally, "])),
-        (r"\bConsequently,?\s", lambda: rng.pick(["As such, ", "For this reason, ", "So "])),
-        (r"\bNevertheless,?\s", lambda: rng.pick(["Even so, ", "That said, ", "Still, "])),
-        (r"\bNonetheless,?\s", lambda: rng.pick(["Even so, ", "Still, ", "Yet "])),
-        (r"\bSubsequently,?\s", lambda: rng.pick(["Then, ", "After that, ", "Next, "])),
-        (r"\bConversely,?\s", lambda: rng.pick(["On the other hand, ", "In contrast, "])),
-        (r"\bUltimately,?\s", lambda: rng.pick(["In the end, ", "Finally, "])),
-        (r"(?i)\bIn\s+addition,?\s", lambda: rng.pick(["Also, ", "Equally, "])),
-        (r"(?i)\bAs\s+a\s+result,?\s", lambda: rng.pick(["Because of this, ", "For this reason, "])),
-        (r"(?i)\bIn\s+particular,?\s", lambda: rng.pick(["Especially, ", "Notably, "])),
-        (r"(?i)\bSpecifically,?\s", lambda: rng.pick(["Namely, ", "That is, "])),
-        (r"(?i)\bAccordingly,?\s", lambda: rng.pick(["For that reason, ", "As such, "])),
-        (r"(?i)\bHence,?\s", lambda: rng.pick(["For this reason, ", "As such, "])),
-        (r"(?i)\bThus,?\s", lambda: rng.pick(["In this way, ", "So, "])),
+        (r"\bFurthermore,?\s", lambda: rng.pick(["Also, ","In addition, ","Equally, "])),
+        (r"\bMoreover,?\s", lambda: rng.pick(["Also, ","Beyond that, ","On top of that, "])),
+        (r"\bAdditionally,?\s", lambda: rng.pick(["Also, ","On top of this, ","Equally, "])),
+        (r"\bConsequently,?\s", lambda: rng.pick(["As such, ","For this reason, ","So "])),
+        (r"\bNevertheless,?\s", lambda: rng.pick(["Even so, ","That said, ","Still, "])),
+        (r"\bNonetheless,?\s", lambda: rng.pick(["Even so, ","Still, ","Yet "])),
+        (r"\bSubsequently,?\s", lambda: rng.pick(["Then, ","After that, ","Next, "])),
+        (r"\bConversely,?\s", lambda: rng.pick(["On the other hand, ","In contrast, "])),
+        (r"\bUltimately,?\s", lambda: rng.pick(["In the end, ","Finally, "])),
+        (r"(?i)\bIn\s+addition,?\s", lambda: rng.pick(["Also, ","Equally, "])),
+        (r"(?i)\bAs\s+a\s+result,?\s", lambda: rng.pick(["Because of this, ","For this reason, "])),
+        (r"(?i)\bIn\s+particular,?\s", lambda: rng.pick(["Especially, ","Notably, "])),
+        (r"(?i)\bSpecifically,?\s", lambda: rng.pick(["Namely, ","That is, "])),
+        (r"(?i)\bAccordingly,?\s", lambda: rng.pick(["For that reason, ","As such, "])),
+        (r"(?i)\bHence,?\s", lambda: rng.pick(["For this reason, ","As such, "])),
+        (r"(?i)\bThus,?\s", lambda: rng.pick(["In this way, ","So, "])),
     ]
     for pat, fn in tr_rules:
         text = _re.sub(pat, lambda m, f=fn: f(), text)
 
     # Formal vocabulary
-    voc_rules = [
+    voc = [
         (r"(?i)\butilizes\b","uses"),(r"(?i)\butilize\b","use"),
         (r"(?i)\butilized\b","used"),(r"(?i)\butilizing\b","using"),
         (r"(?i)\bfacilitates\b","helps"),(r"(?i)\bfacilitate\b","help"),
@@ -308,14 +349,14 @@ def humanize_words(text, rng):
         (r"(?i)\bexpedites\b","speeds up"),(r"(?i)\bexpedite\b","speed up"),
         (r"(?i)\bascertains\b","finds out"),(r"(?i)\bascertained\b","found out"),
     ]
-    for pat, repl in voc_rules:
+    for pat, repl in voc:
         if callable(repl):
             text = _re.sub(pat, lambda m, f=repl: f(), text)
         else:
             text = _re.sub(pat, repl, text)
 
     # AI filler phrases
-    ph_rules = [
+    fillers = [
         (r"(?i)\bIt is important to note that\s*",""),
         (r"(?i)\bIt should be noted that\s*",""),
         (r"(?i)\bIt is worth mentioning that\s*",""),
@@ -357,14 +398,14 @@ def humanize_words(text, rng):
         (r"(?i)\bin terms of\b","regarding"),
         (r"(?i)\bthrough the use of\b","using"),
     ]
-    for pat, repl in ph_rules:
+    for pat, repl in fillers:
         if callable(repl):
             text = _re.sub(pat, lambda m, f=repl: f(), text)
         else:
             text = _re.sub(pat, repl, text)
 
     # Contractions
-    c_rules = [
+    contrs = [
         (r"\bdoes not\b","doesn't"),(r"\bDoes not\b","Doesn't"),
         (r"\bdo not\b","don't"),(r"\bDo not\b","Don't"),
         (r"\bdid not\b","didn't"),(r"\bDid not\b","Didn't"),
@@ -396,11 +437,11 @@ def humanize_words(text, rng):
         (r"\bhas not\b","hasn't"),(r"\bHas not\b","Hasn't"),
         (r"\blet us\b","let's"),(r"\bLet us\b","Let's"),
     ]
-    for pat, repl in c_rules:
+    for pat, repl in contrs:
         text = _re.sub(pat, repl, text)
 
     # Adverb variation
-    adv_rules = [
+    advs = [
         (r"(?i)\bconsiderably\b", lambda: rng.pick(["noticeably","markedly"])),
         (r"(?i)\bremarkably\b", lambda: rng.pick(["surprisingly","strikingly"])),
         (r"(?i)\bparticularly\b", lambda: rng.pick(["especially","notably"])),
@@ -417,11 +458,11 @@ def humanize_words(text, rng):
         (r"(?i)\bconcurrently\b", lambda: rng.pick(["at the same time","in parallel"])),
         (r"(?i)\bexplicitly\b", lambda: rng.pick(["directly","clearly"])),
     ]
-    for pat, fn in adv_rules:
+    for pat, fn in advs:
         text = _re.sub(pat, lambda m, f=fn: f(), text)
 
     # Passive voice
-    pv_rules = [
+    pvs = [
         (r"(?i)\bwas conducted\b", lambda: rng.pick(["took place","was carried out"])),
         (r"(?i)\bwere conducted\b", lambda: rng.pick(["took place","were carried out"])),
         (r"(?i)\bwas observed\b", lambda: rng.pick(["showed up","was noticed"])),
@@ -440,14 +481,14 @@ def humanize_words(text, rng):
         (r"(?i)\bwas achieved\b", lambda: rng.pick(["was reached","was attained"])),
         (r"(?i)\bwere achieved\b", lambda: rng.pick(["were reached","were attained"])),
     ]
-    for pat, repl in pv_rules:
+    for pat, repl in pvs:
         if callable(repl):
             text = _re.sub(pat, lambda m, f=repl: f(), text)
         else:
             text = _re.sub(pat, repl, text)
 
     # AI n-gram breaking
-    ng_rules = [
+    ngrams = [
         (r"(?i)\bIt is worth noting\b", lambda: rng.pick(["Note that","Notably"])),
         (r"(?i)\bThis is particularly true\b", lambda: rng.pick(["This holds especially","This especially applies"])),
         (r"(?i)\bIn light of\b", lambda: rng.pick(["Given","Considering"])),
@@ -470,16 +511,16 @@ def humanize_words(text, rng):
         (r"(?i)\bplay(?:s)? a (?:crucial|vital|critical|key|significant|important) role\b",
          lambda: rng.pick(["matter greatly","is central","is key"])),
     ]
-    for pat, fn in ng_rules:
+    for pat, fn in ngrams:
         text = _re.sub(pat, lambda m, f=fn: f(), text)
 
     return text
 
 
 # ==============================================================
-# ACADEMIC SYNONYM PERTURBATION — 50% rate (up from 30%)
+# ACADEMIC SYNONYM PERTURBATION — 60% rate, 220+ words
 # ==============================================================
-ACADEMIC_SYNONYMS = {
+SYNS = {
     "achieved":["reached","attained","obtained"],
     "achieves":["reaches","attains","gets"],
     "achieve":["reach","attain","get"],
@@ -617,44 +658,43 @@ ACADEMIC_SYNONYMS = {
     "observation":["finding","note","result"],
     "promising":["encouraging","hopeful","positive"],
     "remarkable":["striking","impressive","notable"],
-    "substantial":["large","considerable","sizable"],
     "evaluation":["assessment","testing","review"],
     "evaluations":["assessments","tests","reviews"],
     "segments":["parts","sections","pieces"],
     "segment":["part","section","piece"],
     "feature":["trait","attribute","characteristic"],
+    "leveraging":["using","applying","drawing on"],
+    "mitigating":["reducing","easing","lessening"],
+    "facilitating":["helping","enabling","supporting"],
 }
 
-SYN_PATTERN = _re.compile(
-    r"\b(" + "|".join(_re.escape(w) for w in ACADEMIC_SYNONYMS.keys()) + r")\b",
+SYN_PAT = _re.compile(
+    r"\b(" + "|".join(_re.escape(w) for w in SYNS.keys()) + r")\b",
     _re.IGNORECASE
 )
 
-def perturb_synonyms(text, rng, rate=0.50):
-    def _replace(m):
-        word = m.group(0)
-        lower = word.lower()
-        if lower in ACADEMIC_SYNONYMS and rng.rand() < rate:
-            replacement = rng.pick(ACADEMIC_SYNONYMS[lower])
-            if word[0].isupper():
-                replacement = replacement[0].upper() + replacement[1:]
-            return replacement
-        return word
-    return SYN_PATTERN.sub(_replace, text)
+def perturb_synonyms(text, rng, rate=0.60):
+    def _rep(m):
+        w = m.group(0)
+        lw = w.lower()
+        if lw in SYNS and rng.rand() < rate:
+            r = rng.pick(SYNS[lw])
+            return (r[0].upper() + r[1:]) if w[0].isupper() else r
+        return w
+    return SYN_PAT.sub(_rep, text)
 
 
 # ==============================================================
-# MAIN PIPELINE: sanitize → word humanize → sentence restructure → synonyms
+# MAIN PIPELINE
 # ==============================================================
-def process_paragraph(text, rng):
+def process_paragraph(text, rng, is_para_start=True):
     text = sanitize_text(text)
     text = humanize_words(text, rng)
-
     sentences = split_sentences(text)
     if len(sentences) > 1:
-        sentences = restructure_sentences(sentences, rng)
+        sentences = restructure_sentences(sentences, rng, is_para_start=is_para_start)
+        sentences = break_same_starters(sentences, rng)
     text = " ".join(sentences)
-
     text = perturb_synonyms(text, rng)
     text = _re.sub(r"  +", " ", text).strip()
     return text
@@ -665,7 +705,6 @@ def process_paragraph(text, rng):
 # ==============================================================
 changed = 0
 skipped = 0
-restructured = 0
 seed_counter = 42
 
 def distribute_text_to_runs(runs, new_text):
@@ -689,7 +728,7 @@ def distribute_text_to_runs(runs, new_text):
             run.text = new_text[pos:end]
             pos = end
 
-def do_process_para(para):
+def do_process_para(para, is_first=True):
     global changed, seed_counter
     runs = [r for r in para.runs if r.text]
     if not runs:
@@ -699,7 +738,7 @@ def do_process_para(para):
         return
     seed_counter += 1
     rng = PRNG(seed_counter)
-    processed = process_paragraph(full_text, rng)
+    processed = process_paragraph(full_text, rng, is_para_start=is_first)
     if processed != full_text:
         changed += 1
         if len(runs) == 1:
@@ -712,14 +751,14 @@ for idx, para in enumerate(doc.paragraphs):
     if should_skip(idx, raw):
         skipped += 1
         continue
-    do_process_para(para)
+    do_process_para(para, is_first=True)
 
 for table in doc.tables:
     for row in table.rows:
         for cell in row.cells:
             for p in cell.paragraphs:
                 if p.text.strip():
-                    do_process_para(p)
+                    do_process_para(p, is_first=True)
 
 print(f"\nSkipped: {skipped}")
 print(f"Paragraphs changed: {changed}")
