@@ -84,6 +84,9 @@
       <label title="Replace AI-common vocabulary and sentence patterns with natural human alternatives">
         <input type="checkbox" id="humanize" checked /> Humanize (reduce AI footprint)
       </label>
+      <label title="Academic mode: skip casual markers/asides/emphatics, use academic synonyms instead">
+        <input type="checkbox" id="academicMode" /> Academic mode
+      </label>
       <button id="pasteBtn" class="primary" title="Read text directly from the clipboard">Paste from clipboard</button>
       <button id="processBtn" class="primary" title="Clean text from the left field and copy the result">Process now (Ctrl/⌘+Enter)</button>
       <button id="copyBtn" title="Copy the result to the clipboard">Copy result</button>
@@ -97,7 +100,8 @@
       markers/bullets; <strong>Markdown bold/italic, heading #, decorative lines, extra *</strong>; pseudographics;
       escaping <code>\$</code>.
       <strong>Humanizer</strong>: replaces AI transitions, simplifies formal vocabulary, removes filler phrases,
-      applies contractions, varies sentence openers.
+      applies contractions, varies sentence openers. <strong>Academic mode</strong>: skips casual markers/asides/emphatics,
+      uses academic synonym perturbation instead.
     </div>
   </div>
 
@@ -310,17 +314,35 @@
       return { text, stats };
     }
 
-    // --- Humanizer: reduce AI detection patterns ---
+    // --- Humanizer: reduce AI detection patterns (enhanced with academic mode) ---
     function humanizeText(input){
       const stats = [];
       let text = String(input);
       let _s = 42;
       function rand(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
       function pick(a){ return a[Math.floor(rand() * a.length)]; }
+      const isAcademic = document.getElementById('academicMode').checked;
 
-      // 1) Transition words AI overuses
+      // 1) Transition words AI overuses (academic-appropriate alternatives in academic mode)
       let tc = 0;
-      const trRules = [
+      const trRules = isAcademic ? [
+        [/\bFurthermore,?\s/g, ()=>pick(['Also, ','In addition, ','Equally, '])],
+        [/\bMoreover,?\s/g, ()=>pick(['Also, ','Beyond that, ','On top of that, '])],
+        [/\bAdditionally,?\s/g, ()=>pick(['Also, ','On top of this, ','Equally, '])],
+        [/\bConsequently,?\s/g, ()=>pick(['As such, ','For this reason, ','So '])],
+        [/\bNevertheless,?\s/g, ()=>pick(['Even so, ','That said, ','Still, '])],
+        [/\bNonetheless,?\s/g, ()=>pick(['Even so, ','Still, ','Yet '])],
+        [/\bSubsequently,?\s/g, ()=>pick(['Then, ','After that, ','Next, '])],
+        [/\bConversely,?\s/g, ()=>pick(['On the other hand, ','In contrast, ','Alternatively, '])],
+        [/\bUltimately,?\s/g, ()=>pick(['In the end, ','Finally, '])],
+        [/\bIn\s+addition,?\s/gi, ()=>pick(['Also, ','Equally, ','Along with this, '])],
+        [/\bAs\s+a\s+result,?\s/gi, ()=>pick(['Because of this, ','For this reason, '])],
+        [/\bIn\s+particular,?\s/gi, ()=>pick(['Especially, ','Notably, '])],
+        [/\bSpecifically,?\s/gi, ()=>pick(['Namely, ','That is, ','More precisely, '])],
+        [/\bAccordingly,?\s/gi, ()=>pick(['For that reason, ','As such, '])],
+        [/\bHence,?\s/gi, ()=>pick(['For this reason, ','As such, '])],
+        [/\bThus,?\s/gi, ()=>pick(['In this way, ','So, '])],
+      ] : [
         [/\bFurthermore,?\s/g, ()=>pick(['Also, ','Plus, ','And ','Besides, '])],
         [/\bMoreover,?\s/g, ()=>pick(['Also, ',"What's more, ",'And ','Plus, '])],
         [/\bAdditionally,?\s/g, ()=>pick(['Also, ','Plus, ','And ','Besides, '])],
@@ -409,6 +431,48 @@
         [/\bwith respect to\b/gi,'about'],
         [/\bwith regard to\b/gi,'about'],
         [/\bin the context of\b/gi,'in'],
+        [/\bnotwithstanding\b/gi,'despite'],
+        [/\bwherein\b/gi,'where'],
+        [/\bthereby\b/gi,'and so'],
+        [/\bwhereas\b/gi,'while'],
+        [/\bshowcase(s?)\b/gi,(m,s)=>s?'shows':'show'],
+        [/\bshowcased\b/gi,'showed'],
+        [/\bencompass(es)?\b/gi,(m,s)=>s?'covers':'cover'],
+        [/\bdelve(s?)\b/gi,(m,s)=>s?'digs':'dig'],
+        [/\bdelving\b/gi,'digging'],
+        [/\bharnessing\b/gi,'using'],[/\bharness(es)?\b/gi,'use'],
+        [/\bfostering\b/gi,'building'],[/\bfosters\b/gi,'builds'],
+        [/\bexemplif(y|ies)\b/gi,(m,s)=>s==='ies'?'illustrates':'illustrate'],
+        [/\bexemplified\b/gi,'illustrated'],
+        [/\bpertinent\b/gi,'relevant'],
+        [/\bpreclude(s?)\b/gi,(m,s)=>s?'prevents':'prevent'],
+        [/\bprecluding\b/gi,'preventing'],
+        [/\baforementioned\b/gi,'mentioned earlier'],
+        [/\bherein\b/gi,'here'],
+        [/\bexhibit(s?)\b/gi,(m,s)=>s?'shows':'show'],
+        [/\bexhibited\b/gi,'showed'],[/\bexhibiting\b/gi,'showing'],
+        [/\bmanifest(s?)\b/gi,(m,s)=>s?'shows':'show'],
+        [/\bmanifested\b/gi,'showed'],
+        [/\bconducive\b/gi,'helpful'],
+        [/\bpossess(es)?\b/gi,(m,s)=>s?'has':'have'],
+        [/\brenders?\b/gi,'makes'],[/\brendered\b/gi,'made'],
+        [/\bgarner(s?)\b/gi,(m,s)=>s?'gets':'get'],
+        [/\bgarnered\b/gi,'got'],
+        [/\bin lieu of\b/gi,'instead of'],
+        [/\bmyriad\b/gi,()=>pick(['many','a wide range of'])],
+        [/\bcategorically\b/gi,'firmly'],
+        [/\bexponentially\b/gi,'rapidly'],
+        [/\bintrinsically\b/gi,'by nature'],
+        [/\binherently\b/gi,'by nature'],
+        [/\boverarching\b/gi,'broad'],
+        [/\bunderpinning\b/gi,'supporting'],
+        [/\bunderpins\b/gi,'supports'],
+        [/\bencapsulate(s?)\b/gi,(m,s)=>s?'captures':'capture'],
+        [/\bthe proposed\b/gi,'our'],
+        [/\bthis paper presents\b/gi,'we present'],
+        [/\bthis paper proposes\b/gi,'we propose'],
+        [/\bthis work introduces\b/gi,'we introduce'],
+        [/\bthis work presents\b/gi,'we present'],
       ];
       for(const [re,rep] of vocRules){
         const b=text;
@@ -449,11 +513,26 @@
         [/\bthe vast majority of\b/gi,'most'],
         [/\bin close proximity to\b/gi,'near'],
         [/\bat this juncture\b/gi,'now'],
+        [/\bgiven the fact that\b/gi,()=>pick(['since','because'])],
+        [/\bin light of\b/gi,()=>pick(['given','considering'])],
+        [/\bwith a view to\b/gi,'to'],
+        [/\bin an effort to\b/gi,'to'],
+        [/\bas a means of\b/gi,'to'],
+        [/\bin such a manner that\b/gi,'so that'],
+        [/\bto a large extent\b/gi,'largely'],
+        [/\bto a great extent\b/gi,'greatly'],
+        [/\bby means of\b/gi,'through'],
+        [/\bwith the aim of\b/gi,'to'],
+        [/\bin the case of\b/gi,'for'],
+        [/\bin the process of\b/gi,'while'],
+        [/\bas a consequence of\b/gi,'because of'],
+        [/\bin terms of\b/gi,'regarding'],
+        [/\bthrough the use of\b/gi,'using'],
       ];
       for(const [re,rep] of phRules){
         const b=text;
-        text=text.replace(re,rep);
-        if(text!==b) pc++;
+        if(typeof rep==='function'){ text=text.replace(re,()=>{pc++;return rep();}); }
+        else{ text=text.replace(re,rep); if(text!==b) pc++; }
       }
       if(pc) stats.push(['AI filler phrases simplified', pc]);
 
@@ -498,61 +577,69 @@
       }
       if(cc) stats.push(['Contractions applied', cc]);
 
-      // 5) Sentence opener variation
-      let oc = 0;
-      text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
-        if(rand()<0.10){ oc++; return dot + pick(['And ','But ','So ','Now, ','Still, ','Yet ']) + letter.toLowerCase(); }
-        return m;
-      });
-      if(oc) stats.push(['Sentence openers varied', oc]);
-
-      // 6) Split long sentences at conjunctions
-      let sc = 0;
-      const parts = text.split(/(?<=[.!?])\s+/);
-      const rebuilt = [];
-      for(const s of parts){
-        const wc = s.split(/\s+/).length;
-        if(wc > 25 && rand() < 0.45){
-          let done = false;
-          for(const conj of [' and ',' but ',' while ',' although ',' because ']){
-            const idx = s.indexOf(conj, Math.max(10, Math.floor(s.length/3)));
-            if(idx > 0){
-              let first = s.slice(0,idx).trimEnd();
-              if(!/[.!?]$/.test(first)) first += '.';
-              let second = s.slice(idx+conj.length).trim();
-              if(second && second.split(/\s+/).length > 3){
-                second = second[0].toUpperCase() + second.slice(1);
-                rebuilt.push(first); rebuilt.push(second);
-                sc++; done = true;
-              }
-              break;
-            }
-          }
-          if(!done) rebuilt.push(s);
-        } else { rebuilt.push(s); }
+      // 5) Sentence opener variation (skipped in academic mode)
+      if(!isAcademic){
+        let oc = 0;
+        text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
+          if(rand()<0.10){ oc++; return dot + pick(['And ','But ','So ','Now, ','Still, ','Yet ']) + letter.toLowerCase(); }
+          return m;
+        });
+        if(oc) stats.push(['Sentence openers varied', oc]);
       }
-      text = rebuilt.join(' ');
-      if(sc) stats.push(['Long sentences split', sc]);
 
-      // 7) Informal discourse markers
-      let mc = 0;
-      text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
-        if(rand()<0.10){ mc++;
-          return dot + pick(['Honestly, ','Frankly, ','To be fair, ','In a way, ','Actually, ',
-            'Really, ','Look, ','The thing is, ','Truth be told, ','Granted, ',
-            'Admittedly, ','Interestingly, ']) + letter.toLowerCase();
+      // 6) Split long sentences at conjunctions (skipped in academic mode)
+      if(!isAcademic){
+        let sc = 0;
+        const parts = text.split(/(?<=[.!?])\s+/);
+        const rebuilt = [];
+        for(const s of parts){
+          const wc = s.split(/\s+/).length;
+          if(wc > 25 && rand() < 0.45){
+            let done = false;
+            for(const conj of [' and ',' but ',' while ',' although ',' because ']){
+              const idx = s.indexOf(conj, Math.max(10, Math.floor(s.length/3)));
+              if(idx > 0){
+                let first = s.slice(0,idx).trimEnd();
+                if(!/[.!?]$/.test(first)) first += '.';
+                let second = s.slice(idx+conj.length).trim();
+                if(second && second.split(/\s+/).length > 3){
+                  second = second[0].toUpperCase() + second.slice(1);
+                  rebuilt.push(first); rebuilt.push(second);
+                  sc++; done = true;
+                }
+                break;
+              }
+            }
+            if(!done) rebuilt.push(s);
+          } else { rebuilt.push(s); }
         }
-        return m;
-      });
-      if(mc) stats.push(['Discourse markers added', mc]);
+        text = rebuilt.join(' ');
+        if(sc) stats.push(['Long sentences split', sc]);
+      }
 
-      // 8) Hedging language
-      let hc = 0;
-      text = text.replace(/\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex)\b/gi, (m)=>{
-        if(rand()<0.06){ hc++; return pick(['quite ','fairly ','rather ','pretty ','somewhat '])+m; }
-        return m;
-      });
-      if(hc) stats.push(['Hedging words added', hc]);
+      // 7) Informal discourse markers (skipped in academic mode)
+      if(!isAcademic){
+        let mc = 0;
+        text = text.replace(/(\. )([A-Z])/g, (m,dot,letter)=>{
+          if(rand()<0.10){ mc++;
+            return dot + pick(['Honestly, ','Frankly, ','To be fair, ','In a way, ','Actually, ',
+              'Really, ','Look, ','The thing is, ','Truth be told, ','Granted, ',
+              'Admittedly, ','Interestingly, ']) + letter.toLowerCase();
+          }
+          return m;
+        });
+        if(mc) stats.push(['Discourse markers added', mc]);
+      }
+
+      // 8) Hedging language (skipped in academic mode)
+      if(!isAcademic){
+        let hc = 0;
+        text = text.replace(/\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex)\b/gi, (m)=>{
+          if(rand()<0.06){ hc++; return pick(['quite ','fairly ','rather ','pretty ','somewhat '])+m; }
+          return m;
+        });
+        if(hc) stats.push(['Hedging words added', hc]);
+      }
 
       // 9) Adverb variation
       let ac = 0;
@@ -588,45 +675,49 @@
       }
       if(pvc) stats.push(['Passive voice humanized', pvc]);
 
-      // 11) Repetitive sentence-start breaking
-      let rsb = 0;
-      const sents = text.split(/(?<=[.!?])\s+/);
-      if(sents.length > 2){
-        for(let i=1;i<sents.length;i++){
-          const prevW = (sents[i-1].split(/\s+/)[0])||'';
-          const curW = (sents[i].split(/\s+/)[0])||'';
-          if(curW===prevW && ['The','This','These','That','It','They','There'].includes(curW) && rand()<0.6){
-            rsb++;
-            const alts={
-              The:['Looking at the','As for the','When it comes to the'],
-              This:['Here, this','In practice, this','On that note, this'],
-              These:['All these','Taken together, these','Each of these'],
-              That:['And that','Notably, that'],
-              It:['In short, it','As it turns out, it','Basically, it'],
-              They:['In practice, they','As it happens, they'],
-              There:['As it stands, there','Right now, there','In fact, there']
-            };
-            const opts=alts[curW]||[];
-            if(opts.length){
-              const rest=sents[i].split(/\s+/).slice(1).join(' ');
-              sents[i]=pick(opts)+' '+rest;
+      // 11) Repetitive sentence-start breaking (skipped in academic mode)
+      if(!isAcademic){
+        let rsb = 0;
+        const sents = text.split(/(?<=[.!?])\s+/);
+        if(sents.length > 2){
+          for(let i=1;i<sents.length;i++){
+            const prevW = (sents[i-1].split(/\s+/)[0])||'';
+            const curW = (sents[i].split(/\s+/)[0])||'';
+            if(curW===prevW && ['The','This','These','That','It','They','There'].includes(curW) && rand()<0.6){
+              rsb++;
+              const alts={
+                The:['Looking at the','As for the','When it comes to the'],
+                This:['Here, this','In practice, this','On that note, this'],
+                These:['All these','Taken together, these','Each of these'],
+                That:['And that','Notably, that'],
+                It:['In short, it','As it turns out, it','Basically, it'],
+                They:['In practice, they','As it happens, they'],
+                There:['As it stands, there','Right now, there','In fact, there']
+              };
+              const opts=alts[curW]||[];
+              if(opts.length){
+                const rest=sents[i].split(/\s+/).slice(1).join(' ');
+                sents[i]=pick(opts)+' '+rest;
+              }
             }
           }
+          text=sents.join(' ');
         }
-        text=sents.join(' ');
+        if(rsb) stats.push(['Repetitive starts varied', rsb]);
       }
-      if(rsb) stats.push(['Repetitive starts varied', rsb]);
 
-      // 12) Parenthetical asides
-      let pa=0;
-      const asides=['(and this matters)','(which is a big deal)','(not surprisingly)','(as you\'d expect)',
-        '(worth keeping in mind)','(and this is key)','(for better or worse)','(understandably)',
-        '(at least in theory)','(surprisingly enough)','(to put it mildly)','(rightly so)'];
-      text=text.replace(/[,;]\s/g,(m)=>{
-        if(rand()<0.04){pa++;return m.trimEnd()+' '+pick(asides)+' ';}
-        return m;
-      });
-      if(pa) stats.push(['Parenthetical asides added', pa]);
+      // 12) Parenthetical asides (skipped in academic mode)
+      if(!isAcademic){
+        let pa=0;
+        const asides=['(and this matters)','(which is a big deal)','(not surprisingly)','(as you\'d expect)',
+          '(worth keeping in mind)','(and this is key)','(for better or worse)','(understandably)',
+          '(at least in theory)','(surprisingly enough)','(to put it mildly)','(rightly so)'];
+        text=text.replace(/[,;]\s/g,(m)=>{
+          if(rand()<0.04){pa++;return m.trimEnd()+' '+pick(asides)+' ';}
+          return m;
+        });
+        if(pa) stats.push(['Parenthetical asides added', pa]);
+      }
 
       // 13) AI n-gram pattern breaking
       let ng=0;
@@ -657,15 +748,67 @@
       }
       if(ng) stats.push(['AI n-grams broken', ng]);
 
-      // 14) Emphatic expressions at ~4% of sentence boundaries
-      let em=0;
-      text=text.replace(/(\. )([A-Z])/g,(m,dot,letter)=>{
-        if(rand()<0.04){em++;
-          return dot+pick(['Put simply, ','Here\'s the thing: ','The bottom line is, ','Simply put, '])+letter.toLowerCase();
-        }
-        return m;
-      });
-      if(em) stats.push(['Emphatic touches added', em]);
+      // 14) Emphatic expressions (skipped in academic mode)
+      if(!isAcademic){
+        let em=0;
+        text=text.replace(/(\. )([A-Z])/g,(m,dot,letter)=>{
+          if(rand()<0.04){em++;
+            return dot+pick(['Put simply, ','Here\'s the thing: ','The bottom line is, ','Simply put, '])+letter.toLowerCase();
+          }
+          return m;
+        });
+        if(em) stats.push(['Emphatic touches added', em]);
+      }
+
+      // 15) Academic word-level synonym perturbation (academic mode only)
+      if(isAcademic){
+        let sp=0;
+        const synMap={
+          achieved:['reached','attained'],achieves:['reaches','attains'],
+          accuracy:['precision','correctness'],adequate:['sufficient','enough'],
+          analyze:['examine','study'],analyzed:['examined','studied'],
+          approach:['technique','strategy'],approaches:['techniques','strategies'],
+          architecture:['design','structure'],capability:['ability','capacity'],
+          capabilities:['abilities','capacities'],challenge:['difficulty','hurdle'],
+          challenges:['difficulties','hurdles'],component:['part','element'],
+          components:['parts','elements'],computation:['calculation','processing'],
+          constraint:['limitation','restriction'],constraints:['limitations','restrictions'],
+          critical:['crucial','vital'],dataset:['data collection','corpus'],
+          deployment:['rollout','release'],domain:['field','area'],
+          domains:['fields','areas'],dynamic:['changing','evolving'],
+          efficient:['effective','fast'],efficiency:['effectiveness','speed'],
+          evident:['clear','apparent'],framework:['system','structure'],
+          frameworks:['systems','structures'],hypothesis:['theory','assumption'],
+          impact:['effect','influence'],impacts:['effects','influences'],
+          implement:['build','create'],implemented:['built','set up'],
+          indicate:['show','suggest'],indicates:['shows','suggests'],
+          investigate:['explore','study'],investigated:['explored','studied'],
+          limitation:['drawback','shortcoming'],limitations:['drawbacks','shortcomings'],
+          mechanism:['process','method'],mechanisms:['processes','methods'],
+          module:['unit','block'],modules:['units','blocks'],
+          obtain:['get','gather'],obtained:['got','gathered'],
+          parameter:['setting','variable'],parameters:['settings','variables'],
+          perform:['carry out','do'],performed:['carried out','did'],
+          pipeline:['workflow','sequence'],prevalent:['common','widespread'],
+          prior:['earlier','previous'],procedure:['process','method'],
+          scenario:['situation','case'],scenarios:['situations','cases'],
+          subsequent:['later','following'],sufficient:['enough','adequate'],
+          superior:['better','stronger'],threshold:['cutoff','limit'],
+          various:['different','diverse'],yield:['produce','generate'],
+          yields:['produces','generates'],
+        };
+        const synPat=new RegExp('\\b('+Object.keys(synMap).join('|')+')\\b','gi');
+        text=text.replace(synPat,(m)=>{
+          const lc=m.toLowerCase();
+          if(synMap[lc] && rand()<0.30){
+            sp++;
+            const rep=pick(synMap[lc]);
+            return m[0]===m[0].toUpperCase()?rep[0].toUpperCase()+rep.slice(1):rep;
+          }
+          return m;
+        });
+        if(sp) stats.push(['Academic synonyms applied', sp]);
+      }
 
       return { text, stats };
     }
