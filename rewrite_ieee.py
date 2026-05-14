@@ -248,6 +248,44 @@ def humanize_text(text):
         (r"(?i)\bwherein\b", "where"),
         (r"(?i)\bthereby\b", "by doing this"),
         (r"(?i)\bwhereas\b", "while"),
+        (r"(?i)\bprofound\b", lambda: _pick(["deep", "major", "big"])),
+        (r"(?i)\bprofoundly\b", lambda: _pick(["deeply", "seriously"])),
+        (r"(?i)\bplethora\b", lambda: _pick(["bunch", "ton", "lot"])),
+        (r"(?i)\bmyriad\b", lambda: _pick(["tons of", "many", "all sorts of"])),
+        (r"(?i)\bakin to\b", lambda: _pick(["like", "similar to", "close to"])),
+        (r"(?i)\bfor instance\b", lambda: _pick(["for example", "like", "say"])),
+        (r"(?i)\bin contrast\b", lambda: _pick(["on the other hand", "but", "then again"])),
+        (r"(?i)\bin summary\b", lambda: _pick(["to sum up", "all in all", "in short"])),
+        (r"(?i)\bin conclusion\b", lambda: _pick(["to wrap up", "all in all"])),
+        (r"(?i)\bshowcases\b", "shows"), (r"(?i)\bshowcase\b", "show"),
+        (r"(?i)\bshowcased\b", "showed"), (r"(?i)\bshowcasing\b", "showing"),
+        (r"(?i)\bencompasses\b", "covers"), (r"(?i)\bencompass\b", "cover"),
+        (r"(?i)\bencompassing\b", "covering"),
+        (r"(?i)\bnarrative\b", lambda: _pick(["story", "account", "picture"])),
+        (r"(?i)\bunderpins\b", lambda: _pick(["supports", "backs", "drives"])),
+        (r"(?i)\bunderpinning\b", lambda: _pick(["supporting", "backing", "driving"])),
+        (r"(?i)\brealm\b", lambda: _pick(["area", "field", "space"])),
+        (r"(?i)\blandscape\b", lambda: _pick(["scene", "picture", "space"])),
+        (r"(?i)\becosystem\b", lambda: _pick(["space", "world", "setup"])),
+        (r"(?i)\btangible\b", lambda: _pick(["real", "concrete", "actual"])),
+        (r"(?i)\bnuanced\b", lambda: _pick(["subtle", "detailed", "fine-grained"])),
+        (r"(?i)\boverarching\b", lambda: _pick(["main", "big-picture", "central"])),
+        (r"(?i)\bcrucial\b", lambda: _pick(["key", "vital", "really important"])),
+        (r"(?i)\bcrucially\b", lambda: _pick(["importantly", "vitally"])),
+        (r"(?i)\bindispensable\b", lambda: _pick(["essential", "must-have"])),
+        (r"(?i)\bintricate\b", lambda: _pick(["complex", "detailed", "involved"])),
+        (r"(?i)\bcommendable\b", lambda: _pick(["impressive", "solid", "good"])),
+        (r"(?i)\bmeticulous\b", lambda: _pick(["careful", "thorough", "precise"])),
+        (r"(?i)\bmeticulously\b", lambda: _pick(["carefully", "thoroughly"])),
+        (r"(?i)\bdelve(?:s)?\b", lambda: _pick(["dig", "look", "go"])),
+        (r"(?i)\bdelving\b", lambda: _pick(["digging", "looking"])),
+        (r"(?i)\bfostering\b", lambda: _pick(["building", "encouraging"])),
+        (r"(?i)\bfosters\b", lambda: _pick(["builds", "encourages"])),
+        (r"(?i)\bfoster\b", lambda: _pick(["build", "encourage"])),
+        (r"(?i)\bharnessing\b", lambda: _pick(["using", "tapping into"])),
+        (r"(?i)\bharness(?:es)?\b", lambda: _pick(["use", "tap into"])),
+        (r"(?i)\bpivotal\b", lambda: _pick(["key", "central", "critical"])),
+        (r"(?i)\bunderpinned\b", lambda: _pick(["supported", "backed", "driven"])),
     ]
     for pattern, repl in voc_rules:
         if callable(repl):
@@ -342,18 +380,19 @@ def humanize_text(text):
         # Otherwise lowercase
         return cap_letter.lower()
 
-    # 5) SENTENCE OPENER VARIATION
+    # 5) SENTENCE OPENER VARIATION — aggressive
     def _vary_opener(m):
-        if random.random() < 0.10:
-            prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet "])
+        if random.random() < 0.22:
+            prefix = _pick(["And ", "But ", "So ", "Now, ", "Still, ", "Yet ",
+                            "Sure, ", "True, ", "Mind you, ", "Of course, ",
+                            "Notably, ", "In fact, "])
             rest = text[m.end():]
             lowered = _safe_lower(m.group(2), m.group(2) + rest)
             return m.group(1) + prefix + lowered
         return m.group(0)
     text = _re.sub(r"(\. )([A-Z])", _vary_opener, text)
 
-    # 6) SPLIT LONG SENTENCES AT CONJUNCTIONS
-    # Only split when both halves form viable independent clauses
+    # 6) SPLIT LONG SENTENCES AT CONJUNCTIONS — more aggressive
     clause_starters = {"the", "this", "these", "that", "it", "they", "we", "our",
                        "a", "an", "each", "every", "most", "some", "such", "its",
                        "their", "when", "if", "as", "since", "while"}
@@ -361,16 +400,16 @@ def humanize_text(text):
     rebuilt = []
     for s in parts:
         wc = len(s.split())
-        if wc > 30 and random.random() < 0.35:
+        if wc > 22 and random.random() < 0.55:
             split_done = False
-            for conj in [" but ", " while ", " although ", " because ", " and "]:
-                idx = s.find(conj, max(15, len(s) // 3))
+            for conj in [" but ", " while ", " although ", " because ", " and ", " which ", " where ", " since "]:
+                idx = s.find(conj, max(10, len(s) // 4))
                 if idx > 0:
                     first = s[:idx].rstrip()
                     second = s[idx + len(conj):].strip()
                     second_words = second.split()
                     first_words = first.split()
-                    if (second and len(second_words) > 6 and len(first_words) > 6
+                    if (second and len(second_words) > 4 and len(first_words) > 4
                             and second_words[0].lower() in clause_starters):
                         if not first.endswith((".", "!", "?")):
                             first += "."
@@ -385,14 +424,17 @@ def humanize_text(text):
             rebuilt.append(s)
     text = " ".join(rebuilt)
 
-    # 7) INFORMAL DISCOURSE MARKERS
+    # 7) INFORMAL DISCOURSE MARKERS — heavy injection
     def _inject_marker(m):
-        if random.random() < 0.10:
+        if random.random() < 0.20:
             marker = _pick([
                 "Honestly, ", "Frankly, ", "To be fair, ",
                 "In a way, ", "Actually, ", "Really, ",
                 "Look, ", "The thing is, ", "Truth be told, ",
                 "Granted, ", "Admittedly, ", "Interestingly, ",
+                "No doubt, ", "Fair enough, ", "Point being, ",
+                "Bottom line, ", "For what it's worth, ",
+                "As it happens, ", "If anything, ",
             ])
             rest = text[m.end():]
             lowered = _safe_lower(m.group(2), m.group(2) + rest)
@@ -400,14 +442,15 @@ def humanize_text(text):
         return m.group(0)
     text = _re.sub(r"(\. )([A-Z])", _inject_marker, text)
 
-    # 8) HEDGING LANGUAGE
+    # 8) HEDGING LANGUAGE — much heavier
     def _hedge(m):
-        if random.random() < 0.06:
-            h = _pick(["quite ", "fairly ", "rather ", "pretty ", "somewhat "])
+        if random.random() < 0.18:
+            h = _pick(["quite ", "fairly ", "rather ", "pretty ", "somewhat ",
+                       "arguably ", "relatively ", "reasonably "])
             return h + m.group(0)
         return m.group(0)
     text = _re.sub(
-        r"\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex)\b",
+        r"\b(important|clear|strong|difficult|common|effective|useful|evident|high|low|similar|likely|complex|critical|notable|relevant|robust|specific|broad|deep|large|small|rapid|consistent|distinct|obvious|practical)\b",
         _hedge, text
     )
 
@@ -488,16 +531,17 @@ def humanize_text(text):
                         sentences[i] = replacement + " " + rest
         text = " ".join(sentences)
 
-    # 13) PARENTHETICAL ASIDES
+    # 13) PARENTHETICAL ASIDES — heavier
     asides = [
         "(and this matters)", "(which is a big deal)", "(not surprisingly)",
         "(to no one's surprise)", "(as you'd expect)", "(worth keeping in mind)",
         "(and this is key)", "(for better or worse)", "(understandably)",
         "(at least in theory)", "(in hindsight)", "(surprisingly enough)",
         "(to put it mildly)", "(believe it or not)", "(rightly so)",
+        "(no kidding)", "(go figure)", "(makes sense)", "(fair point)",
     ]
     def _inject_aside(m):
-        if random.random() < 0.04:
+        if random.random() < 0.08:
             aside = _pick(asides)
             return m.group(0).rstrip() + " " + aside + " "
         return m.group(0)
@@ -580,9 +624,9 @@ def humanize_text(text):
     for pattern, replacer in ngram_rules:
         text = _re.sub(pattern, lambda m, fn=replacer: fn(), text)
 
-    # 18) EMPHATIC EXPRESSIONS
+    # 18) EMPHATIC EXPRESSIONS — boosted
     def _emphaticize(m):
-        if random.random() < 0.04:
+        if random.random() < 0.10:
             emphatics = [
                 "What really matters here is that ",
                 "The bottom line is, ",
@@ -590,6 +634,9 @@ def humanize_text(text):
                 "Here's the thing: ",
                 "The real takeaway is that ",
                 "Simply put, ",
+                "Long story short, ",
+                "In plain terms, ",
+                "To be blunt, ",
             ]
             rest = text[m.end():]
             lowered = _safe_lower(m.group(2), m.group(2) + rest)
@@ -603,6 +650,109 @@ def humanize_text(text):
             return ".  " + m.group(1)
         return ". " + m.group(1)
     text = _re.sub(r"\. ([A-Z])", _vary_spacing, text)
+
+    # ── 20) ACADEMIC STIFFNESS BREAKERS ──
+    acad_rules = [
+        (r"(?i)\bthe aforementioned\b", lambda: _pick(["the above", "the earlier", "that"])),
+        (r"(?i)\baforementioned\b", lambda: _pick(["above", "earlier", "said"])),
+        (r"(?i)\bthe present study\b", lambda: _pick(["this work", "our work", "this paper"])),
+        (r"(?i)\bthe current study\b", lambda: _pick(["this work", "our work"])),
+        (r"(?i)\bwe posit that\b", lambda: _pick(["we think", "our view is that", "we believe"])),
+        (r"(?i)\bit has been shown that\b", lambda: _pick(["studies show", "research shows", "evidence says"])),
+        (r"(?i)\bthe empirical evidence\b", lambda: _pick(["the data", "the numbers", "what we found"])),
+        (r"(?i)\bempirically\b", lambda: _pick(["experimentally", "through experiments", "with real data"])),
+        (r"(?i)\bsalient\b", lambda: _pick(["key", "standout", "striking"])),
+        (r"(?i)\bextant\b", lambda: _pick(["existing", "current"])),
+        (r"(?i)\bnon-trivial\b", lambda: _pick(["real", "meaningful", "noteworthy"])),
+        (r"(?i)\bpreclude(?:s)?\b", lambda: _pick(["prevent", "rule out", "block"])),
+        (r"(?i)\bwarrants?\b", lambda: _pick(["calls for", "deserves", "needs"])),
+        (r"(?i)\bcoalesce\b", "come together"),
+        (r"(?i)\bdichotomy\b", lambda: _pick(["split", "divide", "tension"])),
+        (r"(?i)\bcommensurate\b", lambda: _pick(["matching", "proportional", "in line"])),
+        (r"(?i)\bjuxtapos(?:ed|es|ition|ing)\b", lambda: _pick(["side by side", "compared", "contrast"])),
+        (r"(?i)\bexhibit(?:s|ed)?\b", lambda: _pick(["show", "display", "have"])),
+        (r"(?i)\bmanifest(?:s|ed)?\b", lambda: _pick(["show up", "appear", "come through"])),
+        (r"(?i)\bpertain(?:s|ing)?\b", lambda: _pick(["relate", "apply", "connect"])),
+        (r"(?i)\belicit(?:s|ed)?\b", lambda: _pick(["draw out", "bring out", "trigger"])),
+        (r"(?i)\bposit(?:s|ed)?\b", lambda: _pick(["suggest", "argue", "claim"])),
+        (r"(?i)\bpurport(?:s|ed)?\b", lambda: _pick(["claim", "supposedly", "allege"])),
+        (r"(?i)\bamenable\b", lambda: _pick(["open", "suited", "receptive"])),
+        (r"(?i)\btherein\b", lambda: _pick(["in that", "there", "in it"])),
+    ]
+    for pattern, repl in acad_rules:
+        if callable(repl):
+            text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
+        else:
+            text = _re.sub(pattern, repl, text)
+
+    # ── 21) SENTENCE FRAGMENT CREATION ──
+    # ~6% of sentences get a short fragment prepended
+    def _add_fragment(m):
+        if random.random() < 0.06:
+            frag = _pick([
+                "Worth noting.",
+                "A key point.",
+                "Not trivial.",
+                "Big deal.",
+                "Makes sense.",
+                "No surprise there.",
+                "And here's why.",
+                "One more thing.",
+                "Quick aside.",
+                "Important distinction.",
+            ])
+            return m.group(1) + frag + " "
+        return m.group(0)
+    text = _re.sub(r"(\. )(?=[A-Z])", _add_fragment, text)
+
+    # ── 22) WORD ORDER MICRO-VARIATION ──
+    # Move trailing prepositional phrases to front ~8% of sentences
+    def _front_load_prep(sent):
+        m = _re.search(r'^(.+?)((?:,\s*)?(?:in|on|at|by|for|with|from|through|during|after|before|across)\s+[^.!?]{8,40})[.!?]$', sent, _re.IGNORECASE)
+        if m and random.random() < 0.08:
+            main = m.group(1).rstrip(', ')
+            prep = m.group(2).strip().lstrip(', ')
+            return prep[0].upper() + prep[1:] + ", " + main[0].lower() + main[1:] + "."
+        return sent
+
+    sents = _re.split(r'(?<=[.!?])\s+', text)
+    sents = [_front_load_prep(s) for s in sents]
+    text = " ".join(sents)
+
+    # ── 23) TONAL SOFTENERS ──
+    # Replace assertive phrases with softer alternatives
+    soft_rules = [
+        (r"(?i)\bclearly shows\b", lambda: _pick(["seems to show", "appears to show", "points toward"])),
+        (r"(?i)\bclearly demonstrates\b", lambda: _pick(["seems to show", "appears to confirm"])),
+        (r"(?i)\bproves that\b", lambda: _pick(["suggests that", "points to the idea that"])),
+        (r"(?i)\bundeniably\b", lambda: _pick(["pretty clearly", "to a large extent"])),
+        (r"(?i)\bwithout question\b", lambda: _pick(["most likely", "almost certainly"])),
+        (r"(?i)\bwithout doubt\b", lambda: _pick(["very likely", "almost surely"])),
+        (r"(?i)\bincontrovertibly\b", lambda: _pick(["by most accounts", "convincingly"])),
+        (r"(?i)\bunequivocally\b", lambda: _pick(["pretty clearly", "for the most part"])),
+        (r"(?i)\bthe study reveals\b", lambda: _pick(["the data hints", "our results suggest", "the work shows"])),
+        (r"(?i)\bthe analysis reveals\b", lambda: _pick(["the analysis suggests", "what we see is"])),
+        (r"(?i)\bthe data reveals\b", lambda: _pick(["the data suggests", "the numbers hint"])),
+    ]
+    for pattern, repl in soft_rules:
+        text = _re.sub(pattern, lambda m, fn=repl: fn(), text)
+
+    # ── 24) BURSTINESS INJECTOR ──
+    # Occasionally add very short sentence after a long one
+    burst_sents = _re.split(r'(?<=[.!?])\s+', text)
+    if len(burst_sents) > 3:
+        burst_rebuilt = []
+        for i, s in enumerate(burst_sents):
+            burst_rebuilt.append(s)
+            if len(s.split()) > 20 and random.random() < 0.12:
+                mini = _pick([
+                    "That matters.", "This is key.", "Big difference.",
+                    "Not ideal.", "Good sign.", "Worth noting.",
+                    "No small thing.", "Fair enough.", "Hard to ignore.",
+                    "Think about that.", "Pretty telling.",
+                ])
+                burst_rebuilt.append(mini)
+        text = " ".join(burst_rebuilt)
 
     return text
 
@@ -662,7 +812,7 @@ cleaned = 0
 skipped = 0
 
 def process_paragraph_wholistic(para, do_restructure=True):
-    """Process paragraph as a single text unit, then redistribute to runs."""
+    """Process paragraph as a single text unit with DOUBLE-PASS humanization."""
     global restructured, humanized, cleaned
     runs = para.runs
     if not runs:
@@ -675,6 +825,10 @@ def process_paragraph_wholistic(para, do_restructure=True):
     processed = full_text
     if do_restructure:
         processed = restructure_paragraph(processed)
+
+    # PASS 1: full humanization
+    processed = humanize_text(processed)
+    # PASS 2: re-seed and run again for deeper transformation
     processed = humanize_text(processed)
 
     if processed != full_text:
@@ -686,8 +840,6 @@ def process_paragraph_wholistic(para, do_restructure=True):
             if do_restructure:
                 restructured += 1
         else:
-            # Multi-run paragraph: put all text in first run, clear others
-            # but preserve at least first run's formatting
             runs[0].text = ai_text_clean(processed)
             for r in runs[1:]:
                 r.text = ""
@@ -695,7 +847,6 @@ def process_paragraph_wholistic(para, do_restructure=True):
             if do_restructure:
                 restructured += 1
     else:
-        # Even if humanizer made no semantic change, still clean Unicode
         for run in runs:
             if run.text:
                 prev = run.text
