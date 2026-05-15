@@ -613,25 +613,21 @@ def break_copular(sents, rng):
     result = []
     for s in sents:
         w = s.split()
-        if len(w) < 6 or is_formula(s) or has_cite(s[:20]):
+        if len(w) < 8 or is_formula(s) or has_cite(s[:20]):
             result.append(s)
             continue
-        m = _re.match(r'^(The|This|These|A|An)\s+(\w+(?:\s+\w+)?)\s+(is|are)\s+(.+)$', s)
-        if m and rng.rand() < 0.55 and len(m.group(4).split()) >= 3:
+        m = _re.match(r'^(The|A|An)\s+(\w+(?:\s+\w+){0,2})\s+(is|are)\s+(.+)$', s)
+        if m and rng.rand() < 0.45 and len(m.group(4).split()) >= 4:
             det = m.group(1)
             subj = m.group(2)
             verb = m.group(3)
             pred = m.group(4).rstrip('.!?')
-            if subj[0].isupper() and subj not in ('EU','AI','NLP','US','UK'):
+            if subj.split()[0][0].isupper() and subj.split()[0] not in ('EU','AI','NLP','US','UK'):
                 result.append(s)
                 continue
             alt = rng.rand()
-            if alt < 0.35:
+            if alt < 0.5:
                 result.append(f"We consider {det.lower()} {subj} to be {pred}.")
-            elif alt < 0.65:
-                if pred[0].islower():
-                    pred = pred[0].upper() + pred[1:]
-                result.append(f"{pred} - that {verb} what defines {det.lower()} {subj}.")
             else:
                 result.append(f"As for {det.lower()} {subj}, it {verb} {pred}.")
         else:
@@ -823,8 +819,12 @@ def restructure(sents, rng):
                 mass = {'quantitative','computational','overall','above','following','former','latter',
                         'primary','secondary','resulting','remaining','underlying','proposed','same'}
                 if noun not in mass:
-                    alts = {"The":["Our","A given"],"This":["Such a","One such"],
-                            "These":["Such","All these","Several"],"Those":["Such","All those"]}
+                    captured_word = m.group(2).lower()
+                    is_verb_form = captured_word in ('is','are','was','were','has','have','had','can','could',
+                                                     'will','would','shall','should','may','might','must')
+                    alts = {"The":["Our","A given"],"These":["Several","All these"],"Those":["All those"]}
+                    if not is_verb_form:
+                        alts["This"] = ["One such","Such a"]
                     if det in alts and rng.rand() < 0.55:
                         result.append(rng.pick(alts[det]) + " " + m.group(2) + s[m.end():])
                         changed = True
@@ -889,10 +889,10 @@ def enforce_burstiness(sents, rng):
 def enforce_starters(sents, rng):
     if len(sents) < 2:
         return sents
-    alts = {"The":["Our","Each","Every"],"This":["Such a","One such"],
-            "These":["Such","All these","Several"],"Those":["Such","All those"],
+    alts = {"The":["Our","Each"],"These":["Such","Several"],
+            "Those":["Such","All those"],
             "It":["One","That"],"They":["Those systems","All of them"],
-            "We":["Our team","In our work,"],"A":["One","Each","Any"],
+            "We":["Our team","In our work,"],"A":["One","Any"],
             "In":["Within","Across","Throughout"],"For":["Regarding","When it comes to"]}
     result = list(sents)
     for i in range(1, len(result)):
@@ -941,6 +941,7 @@ def process(text, rng):
     text = _re.sub(r"\.\.", ".", text)
     text = _re.sub(r";,", ";", text)
     text = _re.sub(r",,", ",", text)
+    text = _re.sub(r'\(\)', '', text)
     text = _re.sub(r"  +", " ", text).strip()
     return text
 
