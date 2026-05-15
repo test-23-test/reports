@@ -520,10 +520,196 @@ def perturb_syns(text, rng, rate=0.95):
     return SYN_PAT.sub(_rep, text)
 
 
+VERB_PAT = _re.compile(r'\b(is|are|was|were|has|have|had|can|could|will|would|shall|should|may|might|must|does|do|did|remains|becomes|seems|provides|requires|involves|allows|enables|shows|leads|makes|takes|gives|needs|offers|produces|generates|achieves|reaches|uses|applies|runs|gets)\b', _re.I)
+
+# ================================================================
+# THREE-ITEM LIST BREAKER — biggest remaining AI signal
+# ================================================================
+def break_three_lists(text, rng):
+    parts = text.split(', and ')
+    if len(parts) <= 1:
+        return text
+    result = parts[0]
+    for i in range(1, len(parts)):
+        lookback = result[-100:] if len(result) > 100 else result
+        prev_comma = lookback.rfind(', ')
+        is_list = False
+        if prev_comma >= 0:
+            between = lookback[prev_comma+2:]
+            wds = between.split()
+            if len(wds) < 12 and not VERB_PAT.search(between):
+                is_list = True
+        if is_list and rng.rand() < 0.95:
+            conn = rng.pick([' along with ',' as well as ',', plus ',', together with ',
+                             ' coupled with ',' and also '])
+            result = result + conn + parts[i]
+        else:
+            result = result + ', and ' + parts[i]
+    # Also break ", or " lists
+    parts2 = result.split(', or ')
+    if len(parts2) > 1:
+        r2 = parts2[0]
+        for j in range(1, len(parts2)):
+            lb = r2[-100:] if len(r2) > 100 else r2
+            pc = lb.rfind(', ')
+            il = False
+            if pc >= 0:
+                bt = lb[pc+2:]
+                if len(bt.split()) < 10 and not VERB_PAT.search(bt):
+                    il = True
+            if il and rng.rand() < 0.90:
+                cn = rng.pick([' or alternatively ',', or else ',', or perhaps ',', possibly '])
+                r2 = r2 + cn + parts2[j]
+            else:
+                r2 = r2 + ', or ' + parts2[j]
+        result = r2
+    return result
+
+
+# ================================================================
+# FIRST-PERSON CONVERSION — strong human-academic signal
+# ================================================================
+def first_person_convert(text, rng):
+    fps = [
+        (r"(?i)\bthe system is designed to\b", "we designed the system to"),
+        (r"(?i)\bthe model is trained\b", "we trained the model"),
+        (r"(?i)\bthe model was trained\b", "we trained the model"),
+        (r"(?i)\bthe network is trained\b", "we trained the network"),
+        (r"(?i)\bthe method is applied\b", "we applied the method"),
+        (r"(?i)\bthe results are reported\b", "we report the results"),
+        (r"(?i)\bthe results were obtained\b", "we obtained the results"),
+        (r"(?i)\bthe experiments are conducted\b", "we ran the experiments"),
+        (r"(?i)\bthe experiments were conducted\b", "we ran the experiments"),
+        (r"(?i)\bits performance is evaluated\b", "we evaluate its performance"),
+        (r"(?i)\bthe dataset is split\b", "we split the dataset"),
+        (r"(?i)\bthe data is split\b", "we split the data"),
+        (r"(?i)\bthe corpus is split\b", "we split the corpus"),
+        (r"(?i)\bthe analysis reveals\b", "our analysis reveals"),
+        (r"(?i)\bthe evaluation shows\b", "our evaluation shows"),
+        (r"(?i)\bthe approach is tested\b", "we tested the approach"),
+        (r"(?i)\bthe framework is designed\b", "we designed the framework"),
+        (r"(?i)\bthe pipeline is configured\b", "we configured the pipeline"),
+        (r"(?i)\bits effectiveness is\b", "its effectiveness is"),
+        (r"(?i)\bit can be observed that\b", "we observe that"),
+        (r"(?i)\bit can be seen that\b", "we see that"),
+        (r"(?i)\bit was found that\b", "we found that"),
+        (r"(?i)\bit was observed that\b", "we observed that"),
+        (r"(?i)\bit is hypothesized that\b", "we hypothesize that"),
+        (r"(?i)\bthe authors propose\b", "we propose"),
+        (r"(?i)\bthe authors present\b", "we present"),
+        (r"(?i)\bthe paper proposes\b", "we propose"),
+        (r"(?i)\ba comparison is made\b", "we compare"),
+        (r"(?i)\bthe comparison shows\b", "our comparison shows"),
+    ]
+    for p, r in fps:
+        text = _re.sub(p, r, text)
+    return text
+
+
+# ================================================================
+# COPULAR SENTENCE BREAKING
+# ================================================================
+def break_copular(sents, rng):
+    result = []
+    for s in sents:
+        w = s.split()
+        if len(w) < 6 or is_formula(s) or has_cite(s[:20]):
+            result.append(s)
+            continue
+        m = _re.match(r'^(The|This|These|A|An)\s+(\w+(?:\s+\w+)?)\s+(is|are)\s+(.+)$', s)
+        if m and rng.rand() < 0.55 and len(m.group(4).split()) >= 3:
+            det = m.group(1)
+            subj = m.group(2)
+            verb = m.group(3)
+            pred = m.group(4).rstrip('.!?')
+            if subj[0].isupper() and subj not in ('EU','AI','NLP','US','UK'):
+                result.append(s)
+                continue
+            alt = rng.rand()
+            if alt < 0.35:
+                result.append(f"We consider {det.lower()} {subj} to be {pred}.")
+            elif alt < 0.65:
+                if pred[0].islower():
+                    pred = pred[0].upper() + pred[1:]
+                result.append(f"{pred} - that {verb} what defines {det.lower()} {subj}.")
+            else:
+                result.append(f"As for {det.lower()} {subj}, it {verb} {pred}.")
+        else:
+            result.append(s)
+    return result
+
+
+# ================================================================
+# GUARANTEED SENTENCE TOUCH — no sentence passes through unchanged
+# ================================================================
+def guaranteed_touch(sents, orig_text, rng):
+    orig_sents_set = set(split_sents(orig_text))
+    result = []
+    for s in sents:
+        if s not in orig_sents_set or len(s.split()) < 5 or is_formula(s):
+            result.append(s)
+            continue
+        w = s.split()
+        touched = False
+        m = _re.match(r'^(The|This|These|Those|A|An)\s', s)
+        if m and not touched and rng.rand() < 0.70:
+            det = m.group(1)
+            rest = s[m.end():]
+            swaps = {"The":"Our","This":"Such a","These":"Several","Those":"Such","A":"One","An":"One"}
+            if det in swaps and not rest[0].isupper():
+                s = swaps[det] + " " + rest
+                touched = True
+        if not touched:
+            for prep in [' in ',' with ',' for ',' by ',' through ',' via ',' across ']:
+                idx = s.rfind(prep)
+                if idx > len(s)//3 and not has_cite(s[idx:]):
+                    phrase = s[idx+1:].rstrip('.!?')
+                    main = s[:idx].rstrip()
+                    if VERB_PAT.search(main) and len(phrase.split()) >= 2 and len(main.split()) >= 3:
+                        if main[0].isupper():
+                            main = main[0].lower() + main[1:]
+                        s = phrase[0].upper() + phrase[1:] + ", " + main + "."
+                        touched = True
+                        break
+        if not touched:
+            verb_swaps = [(' is ',' remains '),(' are ',' remain '),(' was ',' proved '),
+                          (' were ',' proved '),(' has ',' holds '),(' have ',' hold '),
+                          (' shows ',' reveals '),(' provides ',' offers '),(' requires ',' calls for '),
+                          (' uses ',' taps '),(' makes ',' renders '),(' leads ',' points '),
+                          (' mirrors ',' reflects '),(' motivates ',' drives '),
+                          (' combines ',' merges '),(' enables ',' lets '),(' represents ',' stands for '),
+                          (' contains ',' houses '),(' supports ',' backs '),(' occurs ',' happens '),
+                          (' produces ',' yields '),(' creates ',' builds '),(' involves ',' entails '),
+                          (' appears ',' surfaces '),(' defines ',' pins down '),(' offers ',' gives '),
+                          (' covers ',' spans '),(' affects ',' shapes '),(' determines ',' sets '),
+                          (' follows ',' tracks '),(' remains ',' stays '),(' depends ',' hinges '),
+                          (' allows ',' lets '),(' improves ',' lifts '),(' reduces ',' cuts '),
+                          (' increases ',' grows '),(' describes ',' outlines '),(' suggests ',' hints '),
+                          (' indicates ',' signals '),(' attains ',' hits '),(' exceeds ',' tops '),
+                          (' confirms ',' backs up '),(' reports ',' notes '),(' demands ',' calls for '),
+                          (' achieves ',' lands '),(' matches ',' meets ')]
+            for old, new in verb_swaps:
+                if old in s.lower():
+                    pos = s.lower().find(old)
+                    s = s[:pos] + new + s[pos+len(old):]
+                    touched = True
+                    break
+        if not touched and len(w) > 6:
+            m_at = _re.search(r'(?:at|from|across)\s+\w+\s+\w+', s)
+            if m_at and m_at.start() > 5:
+                phrase = s[m_at.start():].rstrip('.!?')
+                main = s[:m_at.start()].rstrip(', ')
+                if main[0].isupper():
+                    main = main[0].lower() + main[1:]
+                s = phrase[0].upper() + phrase[1:] + ", " + main + "."
+                touched = True
+        result.append(s)
+    return result
+
+
 # ================================================================
 # SENTENCE RESTRUCTURING
 # ================================================================
-VERB_PAT = _re.compile(r'\b(is|are|was|were|has|have|had|can|could|will|would|shall|should|may|might|must|does|do|did|remains|becomes|seems|provides|requires|involves|allows|enables|shows|leads|makes|takes|gives|needs|offers|produces|generates|achieves|reaches|uses|applies|runs|gets)\b', _re.I)
 DEP_STARTS = ('despite','although','while','since','because','if','unless','when','once','even though','given that','whereas')
 
 def restructure(sents, rng):
@@ -727,12 +913,17 @@ def enforce_starters(sents, rng):
 def process(text, rng):
     text = _ud.normalize("NFKC", text)
     text = clean_watermarks(text)
+    orig_text = text
     text = vocab_replace(text, rng)
+    text = first_person_convert(text, rng)
+    text = break_three_lists(text, rng)
     sents = split_sents(text)
     if len(sents) > 1:
         sents = restructure(sents, rng)
         sents = enforce_burstiness(sents, rng)
         sents = enforce_starters(sents, rng)
+    sents = break_copular(sents, rng)
+    sents = guaranteed_touch(sents, orig_text, rng)
     text = " ".join(sents)
     text = perturb_syns(text, rng)
     final_kills = [
